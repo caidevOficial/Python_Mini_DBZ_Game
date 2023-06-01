@@ -15,6 +15,20 @@
 </table></br>
 
 ---
+
+![](https://hit.yhype.me/github/profile?user_id=12877139)
+
+<p align="center">
+    <img src="https://komarev.com/ghpvc/?username=caidevoficial&label=Profile%20views&color=0e75b6&style=plastic" alt="caidevoficial" />
+</p>
+
+<p align="center">
+    <a href="https://github.com/CaidevOficial">
+        <img src="https://github-profile-trophy.vercel.app/?username=caidevoficial&theme=nord&column=7" alt="caidevoficial" />
+    </a>
+</p>
+<br><br><br>
+---
 # Python Mini DBZ Game [For educational purposes only]
 #### Developed by: _Facundo Falcone_ <CaidevOficial>
 Mini game with Dragon Ball Z characters which is created using the Pygame framework.
