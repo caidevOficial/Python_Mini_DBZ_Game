@@ -28,7 +28,9 @@
     </a>
 </p>
 <br><br><br>
+
 ---
+
 # Python Mini DBZ Game [For educational purposes only]
 #### Developed by: _Facundo Falcone_ <CaidevOficial>
 Mini game with Dragon Ball Z characters which is created using the Pygame framework.
