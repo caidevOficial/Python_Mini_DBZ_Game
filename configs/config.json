@@ -1,0 +1,272 @@
+{
+    "stage_1": {
+        "score_multiplier": 2,
+        "difficult_level": [],
+        "scenario": {
+            "stage_name": "NIVEL 1",
+            "background": "./assets/img/background/goku_house.png",
+            "ground_y_coord_level": 50
+        },
+        "enemies": {
+            "enemies_amount": 2,
+            "enemies_configs": {
+                "enemy_min_hp": 100,
+                "enemy_max_hp": 300,
+                "sprites":{
+                    "walk": {
+                        "path": "./assets/img/enemy/cell_jr/walk/walk.png",
+                        "amount_images": 1
+                    },
+                    "run": {
+                        "path": "./assets/img/enemy/cell_jr/walk/walk.png",
+                        "amount_images": 1
+                    },
+                    "attack": {
+                        "path": "./assets/img/enemy/cell_jr/attack/attack.png",
+                        "amount_images": 11
+                    },
+                    "iddle": {
+                        "path": "./assets/img/enemy/cell_jr/iddle/iddle.png",
+                        "amount_images": 1
+                    }
+                }
+            },
+            "enemies_coords": [
+                {"x": 80, "y": 355},
+                {"x": 120, "y": 355},
+                {"x": 190, "y": 355},
+                {"x": 210, "y": 355},
+                {"x": 350, "y": 355}
+            ]
+        },
+        "items": {
+            "items_coords": [
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120}
+            ]
+        },
+        "traps": {
+            "traps_coords": [
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120}
+            ]
+        },
+        "player": {
+            "hp": 100,
+            "coordenadas": {"x": 40, "y": 120}
+        }
+    },
+    "stage_2": {
+        "score_multiplier": 4,
+        "difficult_level": [],
+        "scenario": {
+            "stage_name": "NIVEL 2",
+            "background": "./assets/img/background/tournament.jpg",
+            "ground_y_coord_level": 400
+        },
+        "enemies": {
+            "enemies_amount": 4,
+            "enemies_configs": {
+                "enemy_min_hp": 100,
+                "enemy_max_hp": 300,
+                "sprites":{
+                    "walk": {
+                        "path": "./assets/img/enemy/a16/walk/walk.png",
+                        "amount_images": 1
+                    },
+                    "run": {
+                        "path": "./assets/img/enemy/a16/walk/walk.png",
+                        "amount_images": 1
+                    },
+                    "attack": {
+                        "path": "./assets/img/enemy/a16/attack/attack.png",
+                        "amount_images": 10
+                    },
+                    "iddle": {
+                        "path": "./assets/img/enemy/a16/iddle/iddle.png",
+                        "amount_images": 1
+                    }
+                }
+            },
+            "enemies_coords": [
+                {"x": 80, "y": 410},
+                {"x": 120, "y": 410},
+                {"x": 190, "y": 410},
+                {"x": 210, "y": 415},
+                {"x": 350, "y": 415}
+            ]
+        },
+        "items": {
+            "items_coords": [
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120}
+            ]
+        },
+        "traps": {
+            "traps_coords": [
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120}
+            ]
+        },
+        "player": {
+            "hp": 100,
+            "coordenadas": {"x": 40, "y": 120}
+        }
+    },
+    "stage_3": {
+        "score_multiplier": 6,
+        "difficult_level": [
+            {
+                "multiplier": 1,
+                "max_boss_hp_left": 1000
+            },
+            {
+                "multiplier": 2,
+                "max_boss_hp_left": 650
+            },
+            {
+                "multiplier": 3,
+                "max_boss_hp_left": 300
+            }
+        ],
+        "scenario": {
+            "stage_name": "NIVEL 3",
+            "background": "./assets/img/background/cell_arena.jpg",
+            "ground_y_coord_level": 450
+        },
+        "enemies": {
+            "enemies_amount": 1,
+            "enemies_configs": {
+                "enemy_min_hp": 2000,
+                "enemy_max_hp": 3000,
+                "sprites":{
+                    "walk": {
+                        "path": "./assets/img/enemy/cell/walk/walk.png",
+                        "amount_images": 1
+                    },
+                    "run": {
+                        "path": "./assets/img/enemy/cell/walk/walk.png",
+                        "amount_images": 1
+                    },
+                    "attack": {
+                        "path": "./assets/img/enemy/cell/attack/attack.png",
+                        "amount_images": 12
+                    },
+                    "iddle": {
+                        "path": "./assets/img/enemy/cell/iddle/iddle.png",
+                        "amount_images": 1
+                    }
+                }
+            },
+            "enemies_coords": [
+                {"x": 600, "y": 460}
+            ]
+        },
+        "items": {
+            "items_coords": [
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120}
+            ]
+        },
+        "traps": {
+            "traps_coords": [
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120}
+            ]
+        },
+        "player": {
+            "hp": 100,
+            "coordenadas": {"x": 40, "y": 120}
+        }
+    },
+    "stage_4": {
+        "score_multiplier": 8,
+        "difficult_level": [
+            {
+                "multiplier": 1,
+                "max_boss_hp_left": 1000
+            },
+            {
+                "multiplier": 2,
+                "max_boss_hp_left": 650
+            },
+            {
+                "multiplier": 3,
+                "max_boss_hp_left": 300
+            }
+        ],
+        "scenario": {
+            "stage_name": "NIVEL 4",
+            "background": "./assets/img/background/kaio_planet.png",
+            "ground_y_coord_level": 450
+        },
+        "enemies": {
+            "enemies_amount": 1,
+            "enemies_configs": {
+                "enemy_min_hp": 3000,
+                "enemy_max_hp": 5000,
+                "sprites":{
+                    "walk": {
+                        "path": "./assets/img/enemy/cell/walk/walk.png",
+                        "amount_images": 1
+                    },
+                    "run": {
+                        "path": "./assets/img/enemy/cell/walk/walk.png",
+                        "amount_images": 1
+                    },
+                    "attack": {
+                        "path": "./assets/img/enemy/cell/attack/attack.png",
+                        "amount_images": 12
+                    },
+                    "iddle": {
+                        "path": "./assets/img/enemy/cell/iddle/iddle.png",
+                        "amount_images": 1
+                    }
+                }
+            },
+            "enemies_coords": [
+                {"x": 600, "y": 450}
+            ]
+        },
+        "items": {
+            "items_coords": [
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120}
+            ]
+        },
+        "traps": {
+            "traps_coords": [
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120}
+            ]
+        },
+        "player": {
+            "hp": 100,
+            "coordenadas": {"x": 40, "y": 120}
+        }
+    }
+}
