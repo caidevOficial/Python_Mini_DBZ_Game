@@ -9,7 +9,7 @@
     </tr>
     <tr>
         <td align="center" colspan='2'>
-            <img alt="Logo DBZ Game" src="./assets/img/logo_pygame_dbz.png"/>
+            <img alt="Logo DBZ Game" src="./assets/img/logo/logo_pygame_dbz.png"/>
         </td>
     </tr>
 </table></br>
@@ -62,7 +62,7 @@ This command will install all the necessary libraries to run the program without
     <tbody>
         <tr>
             <td>
-                <img src='./assets/img/gmeplay_01.png'>
+                <img src='./assets/img/logo/gmeplay_01.png'>
             </td>
         </tr>
     </tbody>
