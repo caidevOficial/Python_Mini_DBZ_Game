@@ -40,8 +40,13 @@ class Jugador(pg.sprite.Sprite):
         self.__set_base_sprites()
         #self.__set_transform_sprites()
         self.__sound_path = './assets/sound/'
-        self.__charge_sound = mixer.Sound(f'{self.__sound_path}charge_ssj1.mp3')
-        self.__ki_blast_sound = mixer.Sound(f'{self.__sound_path}ki_blast.mp3')
+        self.__sound_fx = [
+            mixer.Sound(f'{self.__sound_path}charge_ssj1.mp3'),
+            mixer.Sound(f'{self.__sound_path}ki_blast.mp3'),
+            mixer.Sound(f'{self.__sound_path}charge_ssj2.mp3'),
+            mixer.Sound(f'{self.__sound_path}kamehameha_charge.mp3'),
+            mixer.Sound(f'{self.__sound_path}kamehameha_shoot.mp3')
+        ]
         self.__actual_hp = None
         self.__max_hp_by_level = None
         self.__actual_mp = None
@@ -83,6 +88,7 @@ class Jugador(pg.sprite.Sprite):
         self.__kame_shoot_time = 0
         self.__kame_shoot_init_time = 0
         self.__kame_energy_cost = 1500
+        self.__kame_fully_charged_time = 7408
     
     def initial_config(self, max_hp, max_mp):
         self.__max_hp_by_level = max_hp
@@ -91,8 +97,20 @@ class Jugador(pg.sprite.Sprite):
         self.__actual_mp = max_mp
         self.__life_bar = BarraVida(self.__main_screen_surface, self.__max_hp_by_level, self.__actual_hp, 100, 5 , self.rect.centerx+50, self.rect.y -80, 'hp')
         self.__mana_bar = BarraVida(self.__main_screen_surface, self.__max_mp_by_level, self.__actual_mp, 100, 5 , self.rect.centerx+50, self.rect.y -20, 'mp')
-        
     
+    def initial_level_coords(self, coord_x: int, coord_y: int) -> None:
+        self.rect.x = coord_x
+        self.rect.y = coord_y
+
+    def mute_sounds(self, sound_type: str) -> None:
+        match sound_type:
+            case 'charge_kame':
+                if self.__is_transformed:
+                    self.__sound_fx[3].fadeout(500)
+            case 'charge':
+                self.__sound_fx[0].fadeout(500)
+                self.__sound_fx[2].fadeout(500)
+
     @property
     def actual_hit_points(self):
         return self.self.__life_bar.actual_amount
@@ -302,6 +320,8 @@ class Jugador(pg.sprite.Sprite):
             self.jump()
         if lista_teclas_presionadas[pg.K_e] and not lista_teclas_presionadas[pg.K_r]:
             self.shoot()
+        if not lista_teclas_presionadas[pg.K_e]:
+            self.mute_sounds('charge_kame')
         if lista_teclas_presionadas[pg.K_1]:
             print(f'Cantidad de puntos: {self.puntaje} puntos')
         
@@ -309,6 +329,7 @@ class Jugador(pg.sprite.Sprite):
             self.charge_ki(True)
         if not lista_teclas_presionadas[pg.K_r]:
             self.charge_ki(False)
+            self.mute_sounds('charge')
     
     @property
     def puntaje(self) -> int:
@@ -362,13 +383,15 @@ class Jugador(pg.sprite.Sprite):
                         self.change_animation(self.__charge_r)
                     else:
                         self.change_animation(self.__charge_l)
-                    self.__sound_player(self.__charge_sound, 'play', 0.3)
+                    sound = self.__sound_fx[0] if not self.__is_transformed else self.__sound_fx[2]
+                    volume = 0.3 if not self.__is_transformed else 0.9
+                    self.__sound_player(sound, 'play', volume)
                     self.__move_x = 0
                     self.__move_y = 0
             else: 
                 self.__is_charging = False
         else:
-            self.__sound_player(self.__charge_sound, 'stop', 0.3)
+            self.__sound_player(self.__sound_fx[0], 'stop', 0.3)
     
     def walk(self, direction: str = 'Right'):
         match direction:
@@ -410,7 +433,7 @@ class Jugador(pg.sprite.Sprite):
             if self.__check_can_shoot('ki_blast'):
                 self.actual_mana_points = -self.__ki_blast_energy_cost
                 print('!iiiaaaaah!!!!')
-                self.__sound_player(self.__ki_blast_sound, 'play', 0.25)
+                self.__sound_player(self.__sound_fx[1], 'play', 0.25)
                 self.__bullet_group.add(self.create_bullet())
                 self.__ki_blast_time = pg.time.get_ticks()
                 
@@ -429,7 +452,7 @@ class Jugador(pg.sprite.Sprite):
     
     def __check_is_fully_charged(self):
         current_time = pg.time.get_ticks()
-        ready_to_shoot = current_time - self.__kame_charge_init_time >= 10000
+        ready_to_shoot = current_time - self.__kame_charge_init_time >= self.__kame_fully_charged_time
         return self.__is_charging_kame and ready_to_shoot
 
     def __check_finish_super(self):
@@ -447,7 +470,7 @@ class Jugador(pg.sprite.Sprite):
                         self.__is_charging_kame = True
                         self.__kame_charge_time = pg.time.get_ticks()
                         self.__kame_charge_init_time = pg.time.get_ticks()
-                        self.__sound_player(self.__kamehame_charge, 'play', 1)
+                        self.__sound_player(self.__sound_fx[3], 'play', 1)
                         print('!KAAA MEEE HAAA MEEE...')
                         if self.__actual_animation != self.__charge_special_l and self.__actual_animation != self.__charge_special_r:
                             if self.__is_looking_right:
@@ -461,7 +484,7 @@ class Jugador(pg.sprite.Sprite):
                         self.__is_shooting_kame = True
                         self.__kame_shoot_init_time = pg.time.get_ticks()
                         self.__kame_shoot_time = pg.time.get_ticks()
-                        self.__sound_player(self.__kamehame_shoot, 'play', 0.8)
+                        self.__sound_player(self.__sound_fx[4], 'play', 0.8)
                         if self.__actual_animation != self.__shoot_special_l and self.__actual_animation != self.__shoot_special_r:
                             if self.__is_looking_right:
                                 self.change_animation(self.__shoot_special_r)
@@ -508,9 +531,6 @@ class Jugador(pg.sprite.Sprite):
         self.__set_transform_sprites()
         self.__is_charging = False
         self.__is_transformed = True
-        self.__charge_sound = mixer.Sound(f'{self.__sound_path}charge_ssj2.mp3')
-        self.__kamehame_charge = mixer.Sound(f'{self.__sound_path}kamehameha_charge.mp3')
-        self.__kamehame_shoot = mixer.Sound(f'{self.__sound_path}kamehameha_shoot.mp3')
         self.__actual_hp = 5000
         self.__life_bar = BarraVida(self.__main_screen_surface, self.__max_hp_by_level, self.__actual_hp, 100, 5 , self.rect.centerx+50, self.rect.y -80, 'hp')
         self.__mana_bar = BarraVida(self.__main_screen_surface, self.__max_mp_by_level, self.__actual_mp, 100, 5 , self.rect.centerx+50, self.rect.y -20, 'mp')

@@ -41,7 +41,7 @@ class Game:
         self.__actual_stage: Stage = None
         self.__video_length_time = None
         self.__video_initial_time = 0
-        self.__initil_player_config = self.__get_configs().get('player')
+        self.__initial_player_config = self.__get_configs().get('player')
         ModuleInstaller.run_command()
     
     def __get_configs(self) -> dict:
@@ -83,7 +83,7 @@ class Game:
 
     def run_game(self):
         player_gohan = Jugador(self.__screen_surface, 50, 350, frame_rate=70, speed_walk=20, speed_run=40)
-        player_gohan.initial_config(self.__initil_player_config.get('hp'), self.__initil_player_config.get('mp'))
+        player_gohan.initial_config(self.__initial_player_config.get('hp'), self.__initial_player_config.get('mp'))
 
         while self.__executing:
             delta_ms = self.__clock.tick(FPS)

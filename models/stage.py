@@ -51,11 +51,14 @@ class Stage:
         self.__player_presets = self.__stage_configs.get('player')
         self.__player_max_hp = self.__player_presets.get('hp')
         self.__player_max_mp = self.__player_presets.get('mp')
+        self.__player_coords = self.__player_presets.get('coords')
         self.player_sprite.initial_config(self.__player_max_hp, self.__player_max_mp)
+        self.player_sprite.initial_level_coords(self.__player_coords.get('x'), self.__player_coords.get('y'))
         # self.player_sprite.max_hit_points = self.__player_max_hp
         # self.player_sprite.max_mana_points = self.__player_max_mp
         self.__playing_sound = False
-        self.__music_st4 = pg.mixer.Sound('./assets/music/stage_4_bkg_music.mp3')
+        #self.__music_st4 = pg.mixer.Sound('./assets/music/stage_4_bkg_music.mp3')
+        self.__music_stage = pg.mixer.Sound(self.__stage_configs.get('scenario').get('background_music'))
         self.__spawn_enemy()
 
     @property
@@ -72,7 +75,6 @@ class Stage:
         return self.__bgd_scaled_img
 
     def __spawn_enemy(self):
-        
         for i in range(self.__enemies_amount):
             coord = self.__enemies_coords[i]
             self.enemies.add(
@@ -86,15 +88,13 @@ class Stage:
 
     def check_win(self) -> bool:
         match self.__stage_name:
-            case 'stage_1':
-                self.__win = len(self.enemies) == 0
-            case 'stage_2':
-                self.__win = len(self.enemies) == 0
-            case 'stage_3' | 'stage_4':
+            case 'stage_1' | 'stage_2' | 'stage_3' | 'stage_4':
                 self.__win = len(self.enemies) == 0
         
 
     def stage_passed(self):
+        if self.__win:
+            self.__stop_music()
         return self.__win
     
     def __check_collide(self):
@@ -111,13 +111,25 @@ class Stage:
         if enemigos_antes > enemigos_despues:
             self.player_sprite.puntaje += (enemigos_antes - enemigos_despues) * self.__score_multiplier
 
+    def __play_music(self):
+        if not self.__playing_sound:
+            self.__playing_sound = True
+            self.__music_stage.set_volume(0.15)
+            self.__music_stage.play(loops=-1, fade_ms=900)
+    
+    def __stop_music(self):
+        if self.__playing_sound and self.__win:
+            self.__playing_sound = False
+            self.__music_stage.fadeout(150)
+
     def run(self, delta_ms, lista_teclas, lista_teclado_un_click):
         self.player.update(delta_ms, self.__main_screen, lista_teclas, lista_teclado_un_click, self.__floor_y_coord)
         self.enemies.update(delta_ms, self.__main_screen, self.__floor_y_coord)
         self.__check_collide()
-        if not self.__playing_sound and self.__stage_name == 'stage_4':
-            self.__playing_sound = True
-            self.__music_st4.set_volume(0.15)
-            self.__music_st4.play(loops=-1, fade_ms=900)
+        self.__play_music()
+        # if not self.__playing_sound and self.__stage_name == 'stage_4':
+        #     self.__playing_sound = True
+        #     self.__music_st4.set_volume(0.15)
+        #     self.__music_st4.play(loops=-1, fade_ms=900)
         # self.__check_hp_boss()
         self.check_win()
