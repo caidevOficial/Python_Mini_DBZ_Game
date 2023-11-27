@@ -43,6 +43,9 @@ class Game:
         self.__video_initial_time = 0
         self.__initial_player_config = self.__get_configs().get('player')
         ModuleInstaller.run_command()
+        self.__transform_transition_vid_path = './assets/video/player_ssj2_transition.mp4'
+        self.__end_transition_vid_path = './assets/video/player_ssj2_end_battle.mp4'
+        self.__is_playing_last_video = False
     
     def __get_configs(self) -> dict:
         with open('./configs/config.json', 'r') as configs:
@@ -92,11 +95,16 @@ class Game:
                 if self.__actual_stage_number < 5:
                     
                     if self.__actual_stage and self.__actual_stage.stage_passed() and self.__actual_stage.stage_name == 'stage_3':
-                        self.__play_video_transition('./assets/video/player_ssj2_transition.mp4',  ANCHO_VENTANA, ALTO_VENTANA, delta_ms)
+                        self.__play_video_transition(self.__transform_transition_vid_path,  ANCHO_VENTANA, ALTO_VENTANA, delta_ms)
                         self.__actual_stage.player_sprite.do_transformation()
                     self.__actual_stage = Stage(self.__screen_surface, player_gohan, ANCHO_VENTANA, ALTO_VENTANA, f'stage_{self.__actual_stage_number}')
                     print(self.__actual_stage.stage_name)
                     self.__actual_stage_number += 1 # incremento en 1 el stage para cuando tenga que volver a instanciar el nuevo
+                    
+                if self.__actual_stage and self.__actual_stage.stage_passed() and\
+                    self.__actual_stage.stage_name == 'stage_4' and not self.__is_playing_last_video:
+                    self.__is_playing_last_video = True
+                    self.__play_video_transition(self.__end_transition_vid_path,  ANCHO_VENTANA, ALTO_VENTANA, delta_ms)
 
             #print(delta_ms)
             events_list = pg.event.get()

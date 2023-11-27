@@ -114,7 +114,9 @@ class Stage:
     def __play_music(self):
         if not self.__playing_sound:
             self.__playing_sound = True
-            self.__music_stage.set_volume(0.15)
+            self.__music_stage.set_volume(0.35)
+            if self.__stage_name == 'stage_4':
+                self.__music_stage.set_volume(0.15)
             self.__music_stage.play(loops=-1, fade_ms=900)
     
     def __stop_music(self):
