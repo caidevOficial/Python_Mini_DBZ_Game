@@ -48,6 +48,12 @@ class Stage:
         self.__score_multiplier = self.__stage_configs.get('score_multiplier')
         self.__bgd_img = pg.image.load(self.__stage_configs.get('scenario').get('background'))
         self.__bgd_scaled_img = pg.transform.scale(self.__bgd_img, (self.__limit_w, self.__limit_h))
+        self.__player_presets = self.__stage_configs.get('player')
+        self.__player_max_hp = self.__player_presets.get('hp')
+        self.__player_max_mp = self.__player_presets.get('mp')
+        self.player_sprite.initial_config(self.__player_max_hp, self.__player_max_mp)
+        # self.player_sprite.max_hit_points = self.__player_max_hp
+        # self.player_sprite.max_mana_points = self.__player_max_mp
         self.__playing_sound = False
         self.__music_st4 = pg.mixer.Sound('./assets/music/stage_4_bkg_music.mp3')
         self.__spawn_enemy()
