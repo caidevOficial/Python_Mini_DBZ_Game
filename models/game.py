@@ -23,7 +23,7 @@
 import json
 import pygame as pg
 from models.constantes import (
-    ALTO_VENTANA, ANCHO_VENTANA, FPS
+    ALTO_VENTANA, ANCHO_VENTANA, FPS, DEBUG
 )
 from models.playable.player.main_player import Jugador
 from models.stage import Stage
@@ -58,8 +58,9 @@ class Game:
         self.__video_initial_time = int(pg.time.get_ticks() / 1000)
         if not self.__video_length_time:
             self.__video_length_time = vid_1.duration
-            print(f'Duracion del video: {self.__video_length_time} segundos')
-            print(f'El video inicio en: {self.__video_initial_time} segundos de haber comenzado el juego')
+            if DEBUG:
+                print(f'Duracion del video: {self.__video_length_time} segundos')
+                print(f'El video inicio en: {self.__video_initial_time} segundos de haber comenzado el juego')
 
         running = True
         while running:
@@ -84,6 +85,18 @@ class Game:
             pg.display.update()
         pg.display.update()
 
+    def __set_game_title(self) -> None:
+        if self.__actual_stage:
+            match self.__actual_stage.stage_name:
+                case 'stage_1':
+                    pg.display.set_caption('Saga de Andriodes')
+                case 'stage_2':
+                    pg.display.set_caption('Inicio Saga de Cell')
+                case 'stage_3':
+                    pg.display.set_caption('Batalla Contra Cell')
+                case 'stage_4':
+                    pg.display.set_caption('Batalla Final Contra Cell')
+
     def run_game(self):
         player_gohan = Jugador(self.__screen_surface, 50, 350, frame_rate=70, speed_walk=20, speed_run=40)
         player_gohan.initial_config(self.__initial_player_config.get('hp'), self.__initial_player_config.get('mp'))
@@ -98,6 +111,7 @@ class Game:
                         self.__play_video_transition(self.__transform_transition_vid_path,  ANCHO_VENTANA, ALTO_VENTANA, delta_ms)
                         self.__actual_stage.player_sprite.do_transformation()
                     self.__actual_stage = Stage(self.__screen_surface, player_gohan, ANCHO_VENTANA, ALTO_VENTANA, f'stage_{self.__actual_stage_number}')
+                    self.__set_game_title()
                     print(self.__actual_stage.stage_name)
                     self.__actual_stage_number += 1 # incremento en 1 el stage para cuando tenga que volver a instanciar el nuevo
                     

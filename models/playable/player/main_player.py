@@ -148,7 +148,8 @@ class Jugador(pg.sprite.Sprite):
         elif mana_points > 0 and self.__actual_mp + mana_points >= self.__max_mp_by_level:
             self.__actual_mp = self.__max_mp_by_level
         self.__mana_bar.actual_amount = self.__actual_mp
-        print(self.__mana_bar.actual_amount, self.__actual_mp)
+        if DEBUG:
+            print(self.__mana_bar.actual_amount, self.__actual_mp)
     
     @property
     def max_mana_points(self):
@@ -174,8 +175,9 @@ class Jugador(pg.sprite.Sprite):
                 attack_cost = self.__ki_blast_energy_cost
             case 'super':
                 attack_cost = self.__kame_energy_cost
-        print(f'Attack cost: {attack_cost}')
-        print(f'Actual mana points: {self.__actual_mp}')
+        if DEBUG:
+            print(f'Attack cost: {attack_cost}')
+            print(f'Actual mana points: {self.__actual_mp}')
         return self.__actual_mp - attack_cost >= 0
 
 
