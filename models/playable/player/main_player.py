@@ -127,7 +127,7 @@ class Jugador(pg.sprite.Sprite):
         if ((mana_points > 0 and self.__actual_mp + mana_points <= self.__max_mp_by_level) or 
             (mana_points < 0 and self.__actual_mp + mana_points >= 0)):
             self.__actual_mp += mana_points
-        elif mana_points > 0 and self.__actual_mp + mana_points <= self.__max_mp_by_level:
+        elif mana_points > 0 and self.__actual_mp + mana_points >= self.__max_mp_by_level:
             self.__actual_mp = self.__max_mp_by_level
         self.__mana_bar.actual_amount = self.__actual_mp
         print(self.__mana_bar.actual_amount, self.__actual_mp)
@@ -330,7 +330,7 @@ class Jugador(pg.sprite.Sprite):
             case 'ki_blast':
                 return KiBlast(direction, self.rect.centery, direction_str, True)
             case 'kamehame':
-                return Kamehame(direction, self.rect.centery, direction_str, True)
+                return Kamehame(direction, self.rect.centery+15, direction_str, True)
 
     def __cooldown_ready_to_action(self) -> bool:
         curent_time = pg.time.get_ticks()

@@ -28,6 +28,7 @@ from models.constantes import (
 from models.playable.player.main_player import Jugador
 from models.stage import Stage
 from models.video_player.pyvidplayer import Video
+from models.module_installer import ModuleInstaller
 
 class Game:
 
@@ -41,6 +42,7 @@ class Game:
         self.__video_length_time = None
         self.__video_initial_time = 0
         self.__initil_player_config = self.__get_configs().get('player')
+        ModuleInstaller.run_command()
     
     def __get_configs(self) -> dict:
         with open('./configs/config.json', 'r') as configs:
