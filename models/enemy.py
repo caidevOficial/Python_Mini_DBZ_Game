@@ -51,7 +51,7 @@ class Enemy(pg.sprite.Sprite):
         self.__jump = jump
         self.__is_jumping = False
         self.__initial_frame = 0
-        self.__actual_animation = self.__iddle_l
+        self.__actual_animation = self.__walk_l
         self.__actual_img_animation = self.__actual_animation[self.__initial_frame]
         self.rect = self.__actual_img_animation.get_rect()
         self.rect.x = coord_x

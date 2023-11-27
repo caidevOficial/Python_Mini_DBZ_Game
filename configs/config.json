@@ -5,74 +5,11 @@
         "scenario": {
             "stage_name": "NIVEL 1",
             "background": "./assets/img/background/goku_house.png",
-            "ground_y_coord_level": 50
+            "ground_y_coord_level": 20,
+            "background_music": "./assets/music/stage_1_bkg_music.mp3"
         },
         "enemies": {
             "enemies_amount": 2,
-            "enemies_configs": {
-                "enemy_min_hp": 100,
-                "enemy_max_hp": 300,
-                "sprites":{
-                    "walk": {
-                        "path": "./assets/img/enemy/cell_jr/walk/walk.png",
-                        "amount_images": 1
-                    },
-                    "run": {
-                        "path": "./assets/img/enemy/cell_jr/walk/walk.png",
-                        "amount_images": 1
-                    },
-                    "attack": {
-                        "path": "./assets/img/enemy/cell_jr/attack/attack.png",
-                        "amount_images": 11
-                    },
-                    "iddle": {
-                        "path": "./assets/img/enemy/cell_jr/iddle/iddle.png",
-                        "amount_images": 1
-                    }
-                }
-            },
-            "enemies_coords": [
-                {"x": 80, "y": 355},
-                {"x": 120, "y": 355},
-                {"x": 190, "y": 355},
-                {"x": 210, "y": 355},
-                {"x": 350, "y": 355}
-            ]
-        },
-        "items": {
-            "items_coords": [
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120}
-            ]
-        },
-        "traps": {
-            "traps_coords": [
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120}
-            ]
-        },
-        "player": {
-            "hp": 500,
-            "mp": 800,
-            "coordenadas": {"x": 40, "y": 120}
-        }
-    },
-    "stage_2": {
-        "score_multiplier": 4,
-        "difficult_level": [],
-        "scenario": {
-            "stage_name": "NIVEL 2",
-            "background": "./assets/img/background/tournament.jpg",
-            "ground_y_coord_level": 400
-        },
-        "enemies": {
-            "enemies_amount": 4,
             "enemies_configs": {
                 "enemy_min_hp": 100,
                 "enemy_max_hp": 300,
@@ -96,11 +33,11 @@
                 }
             },
             "enemies_coords": [
-                {"x": 80, "y": 410},
-                {"x": 120, "y": 410},
-                {"x": 190, "y": 410},
-                {"x": 210, "y": 415},
-                {"x": 350, "y": 415}
+                {"x": 80, "y": 320},
+                {"x": 120, "y": 320},
+                {"x": 190, "y": 320},
+                {"x": 210, "y": 320},
+                {"x": 350, "y": 320}
             ]
         },
         "items": {
@@ -124,7 +61,74 @@
         "player": {
             "hp": 500,
             "mp": 800,
-            "coordenadas": {"x": 40, "y": 120}
+            "coords": {"x": 40, "y": 290}
+        }
+    },
+    "stage_2": {
+        "score_multiplier": 4,
+        "difficult_level": [],
+        "scenario": {
+            "stage_name": "NIVEL 2",
+            "background": "./assets/img/background/tournament.jpg",
+            "ground_y_coord_level": 400,
+            "background_music": "./assets/music/stage_2_bkg_music.mp3"
+        },
+        "enemies": {
+            "enemies_amount": 7,
+            "enemies_configs": {
+                "enemy_min_hp": 100,
+                "enemy_max_hp": 300,
+                "sprites":{
+                    "walk": {
+                        "path": "./assets/img/enemy/cell_jr/walk/walk.png",
+                        "amount_images": 1
+                    },
+                    "run": {
+                        "path": "./assets/img/enemy/cell_jr/walk/walk.png",
+                        "amount_images": 1
+                    },
+                    "attack": {
+                        "path": "./assets/img/enemy/cell_jr/attack/attack.png",
+                        "amount_images": 11
+                    },
+                    "iddle": {
+                        "path": "./assets/img/enemy/cell_jr/iddle/iddle.png",
+                        "amount_images": 1
+                    }
+                }
+            },
+            "enemies_coords": [
+                {"x": 80, "y": 450},
+                {"x": 120, "y": 450},
+                {"x": 190, "y": 450},
+                {"x": 210, "y": 455},
+                {"x": 350, "y": 455},
+                {"x": 450, "y": 455},
+                {"x": 650, "y": 455}
+            ]
+        },
+        "items": {
+            "items_coords": [
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120}
+            ]
+        },
+        "traps": {
+            "traps_coords": [
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120},
+                {"x": 40, "y": 120}
+            ]
+        },
+        "player": {
+            "hp": 500,
+            "mp": 800,
+            "coords": {"x": 40, "y": 410}
         }
     },
     "stage_3": {
@@ -146,7 +150,8 @@
         "scenario": {
             "stage_name": "NIVEL 3",
             "background": "./assets/img/background/cell_arena.jpg",
-            "ground_y_coord_level": 450
+            "ground_y_coord_level": 390,
+            "background_music": "./assets/music/stage_3_bkg_music.mp3"
         },
         "enemies": {
             "enemies_amount": 1,
@@ -173,7 +178,7 @@
                 }
             },
             "enemies_coords": [
-                {"x": 600, "y": 460}
+                {"x": 600, "y": 410}
             ]
         },
         "items": {
@@ -197,7 +202,7 @@
         "player": {
             "hp": 1500,
             "mp": 1500,
-            "coordenadas": {"x": 40, "y": 120}
+            "coords": {"x": 40, "y": 390}
         }
     },
     "stage_4": {
@@ -219,7 +224,8 @@
         "scenario": {
             "stage_name": "NIVEL 4",
             "background": "./assets/img/background/kaio_planet.png",
-            "ground_y_coord_level": 450
+            "ground_y_coord_level": 430,
+            "background_music": "./assets/music/stage_4_bkg_music.mp3"
         },
         "enemies": {
             "enemies_amount": 1,
@@ -270,7 +276,7 @@
         "player": {
             "hp": 3000,
             "mp": 3000,
-            "coordenadas": {"x": 40, "y": 120}
+            "coords": {"x": 40, "y": 430}
         }
     }
 }
