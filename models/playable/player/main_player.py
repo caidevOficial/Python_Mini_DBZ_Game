@@ -305,27 +305,24 @@ class Player(pg.sprite.Sprite):
     
     def __initial_transform(self, delta_ms: int):
         current_time = pg.time.get_ticks()
-        #time_passed = current_time - delta_ms
-        #print(f'current time: {current_time} | delta: {delta_ms}')
-        #self.__sound_player(self.__sound_fx[5], 'play', 0.3)
         if not self.__player_control:
             if self.__is_base_state and not self.__is_base_transforming:
                 if current_time >= self.__time_until_initial_transform_c and current_time < self.__time_until_initial_transform_c2:
                     self.change_animation(self.__charge_base_r)
                     self.__is_base_transforming = True
                     self.__sound_player(self.__sound_fx[5], 'play', 0.3)
-                    print(f'1° IF: current time: {current_time} | delta: {delta_ms} | transf: {self.__is_base_transforming}')
+                    if DEBUG: print(f'1° IF: current time: {current_time} | delta: {delta_ms} | transf: {self.__is_base_transforming}')
             elif self.__is_base_state and self.__is_base_transforming:
                 if current_time >= self.__time_until_initial_transform_c2:
                     self.change_animation(self.__charge_r)
                     self.__is_base_state = False
-                    print(f'2° IF: current time: {current_time} | delta: {delta_ms} | base: {self.__is_base_state}')
+                    if DEBUG: print(f'2° IF: current time: {current_time} | delta: {delta_ms} | base: {self.__is_base_state}')
             elif not self.__is_base_state and self.__is_base_transforming:
                 if current_time >= self.__time_until_control:
                     self.change_animation(self.__iddle_r)
                     self.__is_base_transforming = False
                     self.__player_control = True
-                    print(f'3° IF: current time: {current_time} | delta: {delta_ms} | control: {self.__player_control}')
+                    if DEBUG: print(f'3° IF: current time: {current_time} | delta: {delta_ms} | control: {self.__player_control}')
         else:
             self.__sound_player(self.__sound_fx[5], 'stop', 0.3)
 

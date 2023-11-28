@@ -62,11 +62,29 @@ This command will install all the necessary libraries to run the program without
     <tbody>
         <tr>
             <td>
-                <img src='./assets/img/logo/gmeplay_01.png'>
+                <img src='./assets/img/logo/game_preview.gif'>
             </td>
         </tr>
     </tbody>
 </table>
+
+<table align='center'>
+    <theader>
+        <th><h2><center>Watch this little video Demo on 🎥</center></h2></th>
+    </theader>
+    <tbody>
+        <tr>
+        <td>
+            <a href="https://www.youtube.com/watch?v=8Umbo8EKFZM" target="_blank">
+                <center>
+                    <img alt='Youtube Logo' src='./assets/img/logo/YT_Logo.png' width=350/>
+                </center>
+            </a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<br><br><br><br><br><br>
 
 <table align='center'>
     <tr align='center'>
