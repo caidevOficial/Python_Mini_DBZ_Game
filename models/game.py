@@ -25,7 +25,7 @@ import pygame as pg
 from models.constantes import (
     ALTO_VENTANA, ANCHO_VENTANA, FPS, DEBUG
 )
-from models.playable.player.main_player import Jugador
+from models.playable.player.main_player import Player
 from models.stage import Stage
 from models.video_player.pyvidplayer import Video
 from models.module_installer import ModuleInstaller
@@ -33,6 +33,7 @@ from models.module_installer import ModuleInstaller
 class Game:
 
     def __init__(self) -> None:
+        ModuleInstaller.run_command()
         self.__executing = True
         self.__screen_surface = pg.display.set_mode((ANCHO_VENTANA, ALTO_VENTANA))
         pg.init()
@@ -42,7 +43,6 @@ class Game:
         self.__video_length_time = None
         self.__video_initial_time = 0
         self.__initial_player_config = self.__get_configs().get('player')
-        ModuleInstaller.run_command()
         self.__transform_transition_vid_path = './assets/video/player_ssj2_transition.mp4'
         self.__end_transition_vid_path = './assets/video/player_ssj2_end_battle.mp4'
         self.__is_playing_last_video = False
@@ -98,7 +98,7 @@ class Game:
                     pg.display.set_caption('Batalla Final Contra Cell')
 
     def run_game(self):
-        player_gohan = Jugador(self.__screen_surface, 50, 350, frame_rate=70, speed_walk=20, speed_run=40)
+        player_gohan = Player(self.__screen_surface, 50, 350, frame_rate=70, speed_walk=20, speed_run=40)
         player_gohan.initial_config(self.__initial_player_config.get('hp'), self.__initial_player_config.get('mp'))
 
         while self.__executing:

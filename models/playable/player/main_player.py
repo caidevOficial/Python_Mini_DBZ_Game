@@ -30,11 +30,17 @@ from models.blasts.kamehame import Kamehame
 import pygame.mixer as mixer
 
 
-class Jugador(pg.sprite.Sprite):
+class Player(pg.sprite.Sprite):
 
     def __init__(self, screen: pg.surface.Surface, coord_x, coord_y, frame_rate = 100, speed_walk = 6, speed_run = 12, gravity = 16, jump = 32):
         super().__init__()
         mixer.init()
+        self.__player_control = False
+        self.__is_base_state = True
+        self.__is_base_transforming = False
+        self.__time_until_initial_transform_c = 3800
+        self.__time_until_initial_transform_c2 = 7982
+        self.__time_until_control = 12454
         self.__main_screen_surface = screen
         self.__metrics = Metrics()
         self.__set_base_sprites()
@@ -44,8 +50,9 @@ class Jugador(pg.sprite.Sprite):
             mixer.Sound(f'{self.__sound_path}charge_ssj1.mp3'),
             mixer.Sound(f'{self.__sound_path}ki_blast.mp3'),
             mixer.Sound(f'{self.__sound_path}charge_ssj2.mp3'),
-            mixer.Sound(f'{self.__sound_path}kamehameha_charge.mp3'),
-            mixer.Sound(f'{self.__sound_path}kamehameha_shoot.mp3')
+            mixer.Sound(f'{self.__sound_path}kamehameha_charge_f.mp3'),
+            mixer.Sound(f'{self.__sound_path}kamehameha_shoot.mp3'),
+            mixer.Sound(f'{self.__sound_path}initial_transform.mp3')
         ]
         self.__actual_hp = None
         self.__max_hp_by_level = None
@@ -63,7 +70,7 @@ class Jugador(pg.sprite.Sprite):
         self.__is_jumping = False
         self.__is_falling = False
         self.__initial_frame = 0
-        self.__actual_animation = self.__iddle_r
+        self.__actual_animation = self.__iddle_base_r
         self.__actual_img_animation = self.__actual_animation[self.__initial_frame]
         self.rect = self.__actual_img_animation.get_rect()
         self.rect.x = coord_x
@@ -88,29 +95,9 @@ class Jugador(pg.sprite.Sprite):
         self.__kame_shoot_time = 0
         self.__kame_shoot_init_time = 0
         self.__kame_energy_cost = 1500
-        self.__kame_fully_charged_time = 7408
+        # self.__kame_fully_charged_time = 7408
+        self.__kame_fully_charged_time = 10594
     
-    def initial_config(self, max_hp, max_mp):
-        self.__max_hp_by_level = max_hp
-        self.__max_mp_by_level = max_mp
-        self.__actual_hp = max_hp
-        self.__actual_mp = max_mp
-        self.__life_bar = BarraVida(self.__main_screen_surface, self.__max_hp_by_level, self.__actual_hp, 100, 5 , self.rect.centerx+50, self.rect.y -80, 'hp')
-        self.__mana_bar = BarraVida(self.__main_screen_surface, self.__max_mp_by_level, self.__actual_mp, 100, 5 , self.rect.centerx+50, self.rect.y -20, 'mp')
-    
-    def initial_level_coords(self, coord_x: int, coord_y: int) -> None:
-        self.rect.x = coord_x
-        self.rect.y = coord_y
-
-    def mute_sounds(self, sound_type: str) -> None:
-        match sound_type:
-            case 'charge_kame':
-                if self.__is_transformed:
-                    self.__sound_fx[3].fadeout(500)
-            case 'charge':
-                self.__sound_fx[0].fadeout(500)
-                self.__sound_fx[2].fadeout(500)
-
     @property
     def actual_hit_points(self):
         return self.self.__life_bar.actual_amount
@@ -168,6 +155,18 @@ class Jugador(pg.sprite.Sprite):
     def life_bar(self):
         return self.__life_bar
     
+    @property
+    def puntaje(self) -> int:
+        return self.__metrics.score_gained
+    
+    @puntaje.setter
+    def puntaje(self, puntos: int):
+        self.__metrics.score_gained += puntos
+    
+    @property
+    def get_blasts(self):
+        return self.__bullet_group
+
     def __check_can_shoot(self, attack_type: str) -> bool:
         attack_cost = 0
         match attack_type:
@@ -179,7 +178,6 @@ class Jugador(pg.sprite.Sprite):
             print(f'Attack cost: {attack_cost}')
             print(f'Actual mana points: {self.__actual_mp}')
         return self.__actual_mp - attack_cost >= 0
-
 
     def __sound_player(self, sound_name: pg.mixer.Sound, play_stop: str, volume: float):
         match play_stop:
@@ -245,7 +243,6 @@ class Jugador(pg.sprite.Sprite):
             pixels_move = self.__move_x if self.rect.x > 0 else 0
         return pixels_move
 
-
     def do_movement(self, delta_ms, floor_y_coord):
         self.__player_move_time += delta_ms
         if self.__player_move_time >= self.__frame_rate:
@@ -268,35 +265,249 @@ class Jugador(pg.sprite.Sprite):
                 #     self.__is_jumping = False
                 #     self.__move_y = 0
     
-    @property
-    def get_blasts(self):
-        return self.__bullet_group
-
-    def update(self, delta_ms, screen: pg.surface.Surface, lista_teclas_presionadas, lista_teclado_un_click, floor_y_coord):
-        self.events_handler(lista_teclas_presionadas, lista_teclado_un_click)
-        self.do_movement(delta_ms, floor_y_coord)
-        self.do_animation(delta_ms)
-        # self.recharge()
-        self.add_gravity()
-        self.__life_bar.update(screen, self.rect.x -2, self.rect.y-15, self.__life_bar.actual_amount)
-        self.__mana_bar.update(screen, self.rect.x -2, self.rect.y-10, self.__mana_bar.actual_amount)
-        self.__bullet_group.update(screen)
-
-        self.draw(screen)
+    def __cooldown_ready_to_action(self) -> bool:
+        curent_time = pg.time.get_ticks()
+        return curent_time - self.__ki_blast_time >= self.__ki_blast_cooldown
     
-    def change_animation(self, nueva_animacion: list[pg.surface.Surface]):
-        self.__actual_animation = nueva_animacion
-        if self.__initial_frame > 0:
+    def __cooldown_charge_super(self):
+        curent_time = pg.time.get_ticks()
+        return curent_time - self.__kame_charge_time >= 10000
+    
+    def __cooldown_shoot_super(self):
+        curent_time = pg.time.get_ticks()
+        return curent_time - self.__kame_shoot_time >= 7000
+
+    # def recharge(self):
+    #     if not self.__ready_to_attack:
+    #         if self.__cooldown_ready_to_action():
+    #             self.__ready_to_attack = True
+    #! Sounds related
+    def mute_sounds(self, sound_type: str) -> None:
+        match sound_type:
+            case 'charge_kame':
+                if self.__is_transformed:
+                    self.__sound_fx[3].fadeout(500)
+            case 'charge':
+                self.__sound_fx[0].fadeout(500)
+                self.__sound_fx[2].fadeout(500)
+
+    def initial_config(self, max_hp, max_mp):
+        self.__max_hp_by_level = max_hp
+        self.__max_mp_by_level = max_mp
+        self.__actual_hp = max_hp
+        self.__actual_mp = max_mp
+        self.__life_bar = BarraVida(self.__main_screen_surface, self.__max_hp_by_level, self.__actual_hp, 100, 5 , self.rect.centerx+50, self.rect.y -80, 'hp')
+        self.__mana_bar = BarraVida(self.__main_screen_surface, self.__max_mp_by_level, self.__actual_mp, 100, 5 , self.rect.centerx+50, self.rect.y -20, 'mp')
+    
+    def initial_level_coords(self, coord_x: int, coord_y: int) -> None:
+        self.rect.x = coord_x
+        self.rect.y = coord_y
+    
+    def __initial_transform(self, delta_ms: int):
+        current_time = pg.time.get_ticks()
+        if not self.__player_control:
+            if self.__is_base_state and not self.__is_base_transforming:
+                if current_time >= self.__time_until_initial_transform_c and current_time < self.__time_until_initial_transform_c2:
+                    self.change_animation(self.__charge_base_r)
+                    self.__is_base_transforming = True
+                    self.__sound_player(self.__sound_fx[5], 'play', 0.3)
+                    if DEBUG: print(f'1° IF: current time: {current_time} | delta: {delta_ms} | transf: {self.__is_base_transforming}')
+            elif self.__is_base_state and self.__is_base_transforming:
+                if current_time >= self.__time_until_initial_transform_c2:
+                    self.change_animation(self.__charge_r)
+                    self.__is_base_state = False
+                    if DEBUG: print(f'2° IF: current time: {current_time} | delta: {delta_ms} | base: {self.__is_base_state}')
+            elif not self.__is_base_state and self.__is_base_transforming:
+                if current_time >= self.__time_until_control:
+                    self.change_animation(self.__iddle_r)
+                    self.__is_base_transforming = False
+                    self.__player_control = True
+                    if DEBUG: print(f'3° IF: current time: {current_time} | delta: {delta_ms} | control: {self.__player_control}')
+        else:
+            self.__sound_player(self.__sound_fx[5], 'stop', 0.3)
+
+
+    #! ACCIONES
+    def __create_ki_power(self, type: str = 'ki_blast'):
+        if self.__is_looking_right:
+            direction = self.rect.right
+            direction_str = 'right'
+        else: 
+            direction = self.rect.left
+            direction_str = 'left'
+        match type:
+            case 'ki_blast':
+                return KiBlast(direction, self.rect.centery, direction_str, True)
+            case 'kamehame':
+                return Kamehame(direction, self.rect.centery+15, direction_str, True)
+
+    def charge_ki(self, charge: bool):
+        if self.__player_control and charge:
+            if self.__is_transformed:
+                self.actual_mana_points = 32
+            self.actual_mana_points = 8
+            # print(self.__actual_mp, self.__mana_bar.actual_amount)
+            if not self.__is_charging and charge:
+                if self.__actual_animation != self.__charge_l and self.__actual_animation != self.__charge_r:
+                    self.__is_charging = True
+                    if self.__is_looking_right:
+                        self.change_animation(self.__charge_r)
+                    else:
+                        self.change_animation(self.__charge_l)
+                    sound = self.__sound_fx[0] if not self.__is_transformed else self.__sound_fx[2]
+                    volume = 0.3 if not self.__is_transformed else 0.9
+                    self.__sound_player(sound, 'play', volume)
+                    self.__move_x = 0
+                    self.__move_y = 0
+            else: 
+                self.__is_charging = False
+        else:
+            self.__sound_player(self.__sound_fx[0], 'stop', 0.3)
+    
+    def walk(self, direction: str = 'Right'):
+        if self.__player_control:
+            match direction:
+                case 'Right':
+                    look_right = True
+                    self.__set_x_animations_preset(self.__speed_walk, self.__walk_r, look_r=look_right)
+                case 'Left':
+                    look_right = False
+                    self.__set_x_animations_preset(-self.__speed_walk, self.__walk_l, look_r=look_right)
+    
+    def run(self, direction: str = 'Right'):
+        if self.__player_control:
             self.__initial_frame = 0
-        self.__actual_img_animation = self.__actual_animation[self.__initial_frame]
-
-    def draw(self, screen: pg.surface.Surface):
-        if DEBUG:
-            pg.draw.rect(screen, 'red', self.rect)
-            #pg.draw.rect(screen, 'green', self.rect.bottom)
-        self.__actual_img_animation = self.__actual_animation[self.__initial_frame]
-        screen.blit(self.__actual_img_animation, self.rect)
+            match direction:
+                case 'Right':
+                    look_right = True
+                    self.__set_x_animations_preset(self.__speed_run, self.__run_r, look_r=look_right)
+                case 'Left':
+                    look_right = False
+                    self.__set_x_animations_preset(-self.__speed_run, self.__run_l, look_r=look_right)
     
+    def stay(self):
+        if self.__player_control:
+            if self.__actual_animation != self.__iddle_l and self.__actual_animation != self.__iddle_r:
+                self.change_animation(self.__iddle_r) if self.__is_looking_right else  self.change_animation(self.__iddle_l)
+                self.__move_x = 0
+                self.__move_y = 0
+    
+    def jump(self):
+        if self.__player_control:
+            if(not self.__is_jumping):
+                if self.__actual_animation != self.__jump_l and self.__actual_animation != self.__jump_r:
+                    self.__is_jumping = True
+                    self.__gravity_vel_y = -self.__jump_power
+                    if(self.__is_looking_right):
+                        self.change_animation(self.__jump_r)
+                    else:
+                        self.change_animation(self.__jump_l)
+    
+    def shoot_ki_blast(self):
+        if self.__player_control:
+            if self.__cooldown_ready_to_action():
+                if self.__check_can_shoot('ki_blast'):
+                    self.actual_mana_points = -self.__ki_blast_energy_cost
+                    print('!iiiaaaaah!!!!')
+                    self.__sound_player(self.__sound_fx[1], 'play', 0.25)
+                    self.__bullet_group.add(self.__create_ki_power())
+                    self.__ki_blast_time = pg.time.get_ticks()
+                    
+                    if self.__actual_animation != self.__ki_blast_l and self.__actual_animation != self.__ki_blast_r:
+                        if self.__is_looking_right:
+                            self.change_animation(self.__ki_blast_r)
+                        else:
+                            self.change_animation(self.__ki_blast_l)
+    
+    def shoot(self):
+        if self.__player_control:
+            if not self.__is_transformed:
+                self.shoot_ki_blast()
+            else:
+                if self.__check_can_shoot('super'):
+                    if not self.__is_charging_kame and not self.__is_shooting_kame:
+                        if self.__cooldown_charge_super():
+                            self.__is_charging_kame = True
+                            self.__kame_charge_time = pg.time.get_ticks()
+                            self.__kame_charge_init_time = pg.time.get_ticks()
+                            self.__sound_player(self.__sound_fx[3], 'play', 1)
+                            print('!KAAA MEEE HAAA MEEE...')
+                            if self.__actual_animation != self.__charge_special_l and self.__actual_animation != self.__charge_special_r:
+                                if self.__is_looking_right:
+                                    self.change_animation(self.__charge_special_r)
+                                else:
+                                    self.change_animation(self.__charge_special_l)
+
+                    else:
+                        if self.__is_charging_kame and self.__check_is_fully_charged() and not self.__is_shooting_kame:
+                            self.__is_charging_kame = False
+                            self.__is_shooting_kame = True
+                            self.__kame_shoot_init_time = pg.time.get_ticks()
+                            self.__kame_shoot_time = pg.time.get_ticks()
+                            self.__sound_player(self.__sound_fx[4], 'play', 0.8)
+                            if self.__actual_animation != self.__shoot_special_l and self.__actual_animation != self.__shoot_special_r:
+                                if self.__is_looking_right:
+                                    self.change_animation(self.__shoot_special_r)
+                                else:
+                                    self.change_animation(self.__shoot_special_l)
+                            self.shoot_super()
+                        elif self.__check_finish_super():
+                            self.__is_shooting_kame = False
+
+    def shoot_super(self):
+        if self.__player_control:
+            print('!HAAAAA!!!!')
+            self.__bullet_group.add(self.__create_ki_power('kamehame'))
+            self.actual_mana_points = -self.__kame_energy_cost
+            self.__kame_shoot_time = pg.time.get_ticks()
+
+    
+    def __check_is_fully_charged(self):
+        current_time = pg.time.get_ticks()
+        ready_to_shoot = current_time - self.__kame_charge_init_time >= self.__kame_fully_charged_time
+        return self.__is_charging_kame and ready_to_shoot
+
+    def __check_finish_super(self):
+        current_time = pg.time.get_ticks()
+        ready_to_shoot = current_time - self.__kame_shoot_init_time >= 9000
+        return self.__is_shooting_kame and ready_to_shoot
+
+    def __set_base_sprites(self):
+        self.__iddle_base_r = sf.get_surface_from_spritesheet('./assets/img/player/base/iddle/iddle.png', 3, 1)
+        self.__iddle_base_l = sf.get_surface_from_spritesheet('./assets/img/player/base/iddle/iddle.png', 3, 1, flip=True)
+        self.__charge_base_r = sf.get_surface_from_spritesheet('./assets/img/player/base/charge/charge.png', 3, 1)
+        self.__charge_base_l = sf.get_surface_from_spritesheet('./assets/img/player/base/charge/charge.png', 3, 1, flip=True)
+        self.__iddle_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/iddle/iddle.png', 3, 1)
+        self.__iddle_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/iddle/iddle.png', 3, 1, flip=True)
+        self.__walk_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/walk/walk.png', 3, 1)
+        self.__walk_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/walk/walk.png', 3, 1, flip=True)
+        self.__run_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/run/run.png', 3, 1)
+        self.__run_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/run/run.png', 3, 1, flip=True)
+        self.__jump_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/jump/jump.png', 3, 1)
+        self.__jump_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/jump/jump.png', 3, 1, flip=True)
+        self.__ki_blast_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/attack/attack.png', 11, 1)
+        self.__ki_blast_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/attack/attack.png', 11, 1, flip=True)
+        self.__charge_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/charge/charge.png', 3, 1)
+        self.__charge_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/charge/charge.png', 3, 1, flip=True)
+
+    def __set_transform_sprites(self):
+        self.__iddle_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/iddle/iddle.png', 3, 1)
+        self.__iddle_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/iddle/iddle.png', 3, 1, flip=True)
+        self.__walk_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/walk/walk.png', 3, 1)
+        self.__walk_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/walk/walk.png', 3, 1, flip=True)
+        self.__run_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/run/run.png', 3, 1)
+        self.__run_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/run/run.png', 3, 1, flip=True)
+        self.__jump_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/jump/jump.png', 3, 1)
+        self.__jump_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/jump/jump.png', 3, 1, flip=True)
+        self.__ki_blast_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/attack/attack.png', 2, 1)
+        self.__ki_blast_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/attack/attack.png', 2, 1, flip=True)
+        self.__charge_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/charge/charge.png', 3, 1)
+        self.__charge_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/charge/charge.png', 3, 1, flip=True)
+        self.__charge_special_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/attack_special/charge_kame.png', 3, 1)
+        self.__charge_special_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/attack_special/charge_kame.png', 3, 1, flip=True)
+        self.__shoot_special_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/attack_special/shoot_kame.png', 1, 1)
+        self.__shoot_special_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/attack_special/shoot_kame.png', 1, 1, flip=True)
+
     def events_handler(self, lista_teclas_presionadas, lista_teclado_un_click):
         # for event in lista_teclado_un_click:
         #     match event.type:
@@ -333,202 +544,6 @@ class Jugador(pg.sprite.Sprite):
             self.charge_ki(False)
             self.mute_sounds('charge')
     
-    @property
-    def puntaje(self) -> int:
-        return self.__metrics.score_gained
-    
-    @puntaje.setter
-    def puntaje(self, puntos: int):
-        self.__metrics.score_gained += puntos
-    
-    #! ACCIONES
-    def create_bullet(self, type: str = 'ki_blast'):
-        if self.__is_looking_right:
-            direction = self.rect.right
-            direction_str = 'right'
-        else: 
-            direction = self.rect.left
-            direction_str = 'left'
-        match type:
-            case 'ki_blast':
-                return KiBlast(direction, self.rect.centery, direction_str, True)
-            case 'kamehame':
-                return Kamehame(direction, self.rect.centery+15, direction_str, True)
-
-    def __cooldown_ready_to_action(self) -> bool:
-        curent_time = pg.time.get_ticks()
-        return curent_time - self.__ki_blast_time >= self.__ki_blast_cooldown
-    
-    def __cooldown_charge_super(self):
-        curent_time = pg.time.get_ticks()
-        return curent_time - self.__kame_charge_time >= 10000
-    
-    def __cooldown_shoot_super(self):
-        curent_time = pg.time.get_ticks()
-        return curent_time - self.__kame_shoot_time >= 7000
-
-    # def recharge(self):
-    #     if not self.__ready_to_attack:
-    #         if self.__cooldown_ready_to_action():
-    #             self.__ready_to_attack = True
-    
-    def charge_ki(self, charge: bool):
-        if charge:
-            if self.__is_transformed:
-                self.actual_mana_points = 32
-            self.actual_mana_points = 8
-            # print(self.__actual_mp, self.__mana_bar.actual_amount)
-            if not self.__is_charging and charge:
-                if self.__actual_animation != self.__charge_l and self.__actual_animation != self.__charge_r:
-                    self.__is_charging = True
-                    if self.__is_looking_right:
-                        self.change_animation(self.__charge_r)
-                    else:
-                        self.change_animation(self.__charge_l)
-                    sound = self.__sound_fx[0] if not self.__is_transformed else self.__sound_fx[2]
-                    volume = 0.3 if not self.__is_transformed else 0.9
-                    self.__sound_player(sound, 'play', volume)
-                    self.__move_x = 0
-                    self.__move_y = 0
-            else: 
-                self.__is_charging = False
-        else:
-            self.__sound_player(self.__sound_fx[0], 'stop', 0.3)
-    
-    def walk(self, direction: str = 'Right'):
-        match direction:
-            case 'Right':
-                look_right = True
-                self.__set_x_animations_preset(self.__speed_walk, self.__walk_r, look_r=look_right)
-            case 'Left':
-                look_right = False
-                self.__set_x_animations_preset(-self.__speed_walk, self.__walk_l, look_r=look_right)
-    
-    def run(self, direction: str = 'Right'):
-        self.__initial_frame = 0
-        match direction:
-            case 'Right':
-                look_right = True
-                self.__set_x_animations_preset(self.__speed_run, self.__run_r, look_r=look_right)
-            case 'Left':
-                look_right = False
-                self.__set_x_animations_preset(-self.__speed_run, self.__run_l, look_r=look_right)
-    
-    def stay(self):
-        if self.__actual_animation != self.__iddle_l and self.__actual_animation != self.__iddle_r:
-            self.change_animation(self.__iddle_r) if self.__is_looking_right else  self.change_animation(self.__iddle_l)
-            self.__move_x = 0
-            self.__move_y = 0
-    
-    def jump(self):
-        if(not self.__is_jumping):
-            if self.__actual_animation != self.__jump_l and self.__actual_animation != self.__jump_r:
-                self.__is_jumping = True
-                self.__gravity_vel_y = -self.__jump_power
-                if(self.__is_looking_right):
-                    self.change_animation(self.__jump_r)
-                else:
-                    self.change_animation(self.__jump_l)
-    
-    def shoot_ki_blast(self):
-        if self.__cooldown_ready_to_action():
-            if self.__check_can_shoot('ki_blast'):
-                self.actual_mana_points = -self.__ki_blast_energy_cost
-                print('!iiiaaaaah!!!!')
-                self.__sound_player(self.__sound_fx[1], 'play', 0.25)
-                self.__bullet_group.add(self.create_bullet())
-                self.__ki_blast_time = pg.time.get_ticks()
-                
-                if self.__actual_animation != self.__ki_blast_l and self.__actual_animation != self.__ki_blast_r:
-                    if self.__is_looking_right:
-                        self.change_animation(self.__ki_blast_r)
-                    else:
-                        self.change_animation(self.__ki_blast_l)
-    
-    def shoot_super(self):
-        print('!HAAAAA!!!!')
-        self.__bullet_group.add(self.create_bullet('kamehame'))
-        self.actual_mana_points = -self.__kame_energy_cost
-        self.__kame_shoot_time = pg.time.get_ticks()
-
-    
-    def __check_is_fully_charged(self):
-        current_time = pg.time.get_ticks()
-        ready_to_shoot = current_time - self.__kame_charge_init_time >= self.__kame_fully_charged_time
-        return self.__is_charging_kame and ready_to_shoot
-
-    def __check_finish_super(self):
-        current_time = pg.time.get_ticks()
-        ready_to_shoot = current_time - self.__kame_shoot_init_time >= 9000
-        return self.__is_shooting_kame and ready_to_shoot
-
-    def shoot(self):
-        if not self.__is_transformed:
-            self.shoot_ki_blast()
-        else:
-            if self.__check_can_shoot('super'):
-                if not self.__is_charging_kame and not self.__is_shooting_kame:
-                    if self.__cooldown_charge_super():
-                        self.__is_charging_kame = True
-                        self.__kame_charge_time = pg.time.get_ticks()
-                        self.__kame_charge_init_time = pg.time.get_ticks()
-                        self.__sound_player(self.__sound_fx[3], 'play', 1)
-                        print('!KAAA MEEE HAAA MEEE...')
-                        if self.__actual_animation != self.__charge_special_l and self.__actual_animation != self.__charge_special_r:
-                            if self.__is_looking_right:
-                                self.change_animation(self.__charge_special_r)
-                            else:
-                                self.change_animation(self.__charge_special_l)
-
-                else:
-                    if self.__is_charging_kame and self.__check_is_fully_charged() and not self.__is_shooting_kame:
-                        self.__is_charging_kame = False
-                        self.__is_shooting_kame = True
-                        self.__kame_shoot_init_time = pg.time.get_ticks()
-                        self.__kame_shoot_time = pg.time.get_ticks()
-                        self.__sound_player(self.__sound_fx[4], 'play', 0.8)
-                        if self.__actual_animation != self.__shoot_special_l and self.__actual_animation != self.__shoot_special_r:
-                            if self.__is_looking_right:
-                                self.change_animation(self.__shoot_special_r)
-                            else:
-                                self.change_animation(self.__shoot_special_l)
-                        self.shoot_super()
-                    elif self.__check_finish_super():
-                        self.__is_shooting_kame = False
-
-    
-    def __set_base_sprites(self):
-        self.__iddle_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/iddle/iddle.png', 3, 1)
-        self.__iddle_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/iddle/iddle.png', 3, 1, flip=True)
-        self.__walk_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/walk/walk.png', 3, 1)
-        self.__walk_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/walk/walk.png', 3, 1, flip=True)
-        self.__run_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/run/run.png', 3, 1)
-        self.__run_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/run/run.png', 3, 1, flip=True)
-        self.__jump_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/jump/jump.png', 3, 1)
-        self.__jump_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/jump/jump.png', 3, 1, flip=True)
-        self.__ki_blast_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/attack/attack.png', 11, 1)
-        self.__ki_blast_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/attack/attack.png', 11, 1, flip=True)
-        self.__charge_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/charge/charge.png', 3, 1)
-        self.__charge_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_1/charge/charge.png', 3, 1, flip=True)
-
-    def __set_transform_sprites(self):
-        self.__iddle_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/iddle/iddle.png', 3, 1)
-        self.__iddle_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/iddle/iddle.png', 3, 1, flip=True)
-        self.__walk_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/walk/walk.png', 3, 1)
-        self.__walk_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/walk/walk.png', 3, 1, flip=True)
-        self.__run_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/run/run.png', 3, 1)
-        self.__run_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/run/run.png', 3, 1, flip=True)
-        self.__jump_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/jump/jump.png', 3, 1)
-        self.__jump_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/jump/jump.png', 3, 1, flip=True)
-        self.__ki_blast_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/attack/attack.png', 2, 1)
-        self.__ki_blast_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/attack/attack.png', 2, 1, flip=True)
-        self.__charge_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/charge/charge.png', 3, 1)
-        self.__charge_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/charge/charge.png', 3, 1, flip=True)
-        self.__charge_special_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/attack_special/charge_kame.png', 3, 1)
-        self.__charge_special_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/attack_special/charge_kame.png', 3, 1, flip=True)
-        self.__shoot_special_r = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/attack_special/shoot_kame.png', 1, 1)
-        self.__shoot_special_l = sf.get_surface_from_spritesheet('./assets/img/player/ssj_2/attack_special/shoot_kame.png', 1, 1, flip=True)
-
     def do_transformation(self):
         self.__set_transform_sprites()
         self.__is_charging = False
@@ -536,3 +551,30 @@ class Jugador(pg.sprite.Sprite):
         self.__actual_hp = 5000
         self.__life_bar = BarraVida(self.__main_screen_surface, self.__max_hp_by_level, self.__actual_hp, 100, 5 , self.rect.centerx+50, self.rect.y -80, 'hp')
         self.__mana_bar = BarraVida(self.__main_screen_surface, self.__max_mp_by_level, self.__actual_mp, 100, 5 , self.rect.centerx+50, self.rect.y -20, 'mp')
+    
+    def change_animation(self, nueva_animacion: list[pg.surface.Surface]):
+        self.__actual_animation = nueva_animacion
+        if self.__initial_frame > 0:
+            self.__initial_frame = 0
+        self.__actual_img_animation = self.__actual_animation[self.__initial_frame]
+
+    def draw(self, screen: pg.surface.Surface):
+        if DEBUG:
+            pg.draw.rect(screen, 'red', self.rect)
+            #pg.draw.rect(screen, 'green', self.rect.bottom)
+        self.__actual_img_animation = self.__actual_animation[self.__initial_frame]
+        screen.blit(self.__actual_img_animation, self.rect)
+
+    def update(self, delta_ms, screen: pg.surface.Surface, lista_teclas_presionadas, lista_teclado_un_click, floor_y_coord):
+        self.__initial_transform(delta_ms)
+        self.events_handler(lista_teclas_presionadas, lista_teclado_un_click)
+        self.do_movement(delta_ms, floor_y_coord)
+        self.do_animation(delta_ms)
+        # self.recharge()
+        self.add_gravity()
+        self.__life_bar.update(screen, self.rect.x -2, self.rect.y-15, self.__life_bar.actual_amount)
+        self.__mana_bar.update(screen, self.rect.x -2, self.rect.y-10, self.__mana_bar.actual_amount)
+        self.__bullet_group.update(screen)
+        self.draw(screen)
+    
+    
