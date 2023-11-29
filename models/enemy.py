@@ -29,7 +29,7 @@ import random as rd
 
 class Enemy(pg.sprite.Sprite):
 
-    def __init__(self, coord_x, coord_y, config_dictionary: dict, frame_rate = 120, speed_walk = 6, speed_run = 12, gravity = 16, jump = 32):
+    def __init__(self, coord_x, coord_y, config_dictionary: dict, frame_rate = 120, speed_walk = 3, speed_run = 6, gravity = 16, jump = 32):
         super().__init__()
         self.__configs = config_dictionary
         self.__iddle_r = sf.get_surface_from_spritesheet(self.__configs.get('sprites').get('iddle').get('path'), self.__configs.get('sprites').get('iddle').get('amount_images'), 1)

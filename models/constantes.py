@@ -23,7 +23,7 @@
 
 ANCHO_VENTANA = 800
 ALTO_VENTANA = 600
-FPS = 30
+FPS = 60
 DEBUG = False
 
 # Colores

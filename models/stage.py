@@ -43,7 +43,6 @@ class Stage:
         self.items = pg.sprite.Group()
         self.__get_configs()
         self.__floor_y_coord = self.__stage_configs.get('scenario').get('ground_y_coord_level')
-
         self.__score_added = False
         
         self.__enemies_coords: list[dict] = self.__stage_configs.get('enemies').get('enemies_coords')
@@ -133,7 +132,7 @@ class Stage:
             # pg.sprite.spritecollide(blast, self.enemies, True)
             # if cantidad_enemigos_antes > cantidad_enemigos_despues:
             #     blast.kill()
-
+    
     def run(self, delta_ms, lista_teclas, lista_teclado_un_click):
         self.enemies.update(delta_ms, self.__main_screen, self.__floor_y_coord)
         self.__explotions_group.update(self.__main_screen)
