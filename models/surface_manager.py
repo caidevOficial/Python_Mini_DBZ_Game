@@ -25,7 +25,7 @@ import pygame as pg
 class SurfaceManager:
 
     @staticmethod
-    def get_surface_from_spritesheet(img_path: str, cols: int, rows: int, step = 1, flip: bool = False) -> list[pg.surface.Surface]:
+    def get_surface_from_spritesheet(img_path: str, cols: int, rows: int, step = 1, scale_2x: bool = True, dimentions: tuple = None, flip: bool = False) -> list[pg.surface.Surface]:
         sprites_list = list()
         surface_img = pg.image.load(img_path).convert_alpha()
         frame_width = int(surface_img.get_width()/cols)
@@ -44,6 +44,9 @@ class SurfaceManager:
                 if flip:
                     frame_surface = pg.transform.flip(frame_surface, True, False)
                 # opcional para escalar la imagen tamaño x2
-                frame_surface = pg.transform.scale2x(frame_surface)
+                if scale_2x:
+                    frame_surface = pg.transform.scale2x(frame_surface)
+                if dimentions:
+                    frame_surface = pg.transform.scale(frame_surface, dimentions)
                 sprites_list.append(frame_surface)
         return sprites_list

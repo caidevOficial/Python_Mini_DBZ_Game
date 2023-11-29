@@ -40,6 +40,7 @@ class Enemy(pg.sprite.Sprite):
         self.__run_l = sf.get_surface_from_spritesheet(self.__configs.get('sprites').get('run').get('path'), self.__configs.get('sprites').get('run').get('amount_images'), 1, flip=True)
         self.__attack_r = sf.get_surface_from_spritesheet(self.__configs.get('sprites').get('attack').get('path'), self.__configs.get('sprites').get('attack').get('amount_images'), 1)
         self.__attack_l = sf.get_surface_from_spritesheet(self.__configs.get('sprites').get('attack').get('path'), self.__configs.get('sprites').get('attack').get('amount_images'), 1, flip=True)
+        self.__bullet_group = pg.sprite.Group()
         self.__move_x = 0
         self.__move_y = 0
         self.__speed_walk = speed_walk

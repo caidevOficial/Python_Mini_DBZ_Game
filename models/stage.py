@@ -24,6 +24,7 @@ import json
 import pygame as pg
 from models.playable.player.main_player import Player
 from models.enemy import Enemy
+from models.explotion import Explotion
 
 class Stage:
 
@@ -36,6 +37,7 @@ class Stage:
         self.__limit_h = limit_h
         self.__main_screen = screen
         self.__win = False
+        self.__explotions_group = pg.sprite.Group()
         self.player = pg.sprite.GroupSingle(self.player_sprite)
         self.enemies = pg.sprite.Group()
         self.items = pg.sprite.Group()
@@ -112,18 +114,30 @@ class Stage:
             self.__playing_sound = False
             self.__music_stage.fadeout(150)
 
+    def __add_explotion(self, enemy_rect: pg.rect.Rect):
+        self.__explotions_group.add(
+            Explotion(enemy_rect.center, None)
+        )
+
     def __check_collide(self):
         for blast in self.player_sprite.get_blasts:
             cantidad_enemigos_antes = len(self.enemies)
-            pg.sprite.spritecollide(blast, self.enemies, True)
-            cantidad_enemigos_despues = len(self.enemies)
-            self.__asignar_puntajes_a_jugador(cantidad_enemigos_antes, cantidad_enemigos_despues)
-            if cantidad_enemigos_antes > cantidad_enemigos_despues:
-                blast.kill()
+            for enemy in self.enemies:
+                if pg.sprite.collide_rect(blast, enemy):
+                    self.__add_explotion(enemy.rect)
+                    blast.kill()
+                    enemy.kill()
+                    cantidad_enemigos_despues = len(self.enemies)
+                    self.__asignar_puntajes_a_jugador(cantidad_enemigos_antes, cantidad_enemigos_despues)
+            
+            # pg.sprite.spritecollide(blast, self.enemies, True)
+            # if cantidad_enemigos_antes > cantidad_enemigos_despues:
+            #     blast.kill()
 
     def run(self, delta_ms, lista_teclas, lista_teclado_un_click):
-        self.player.update(delta_ms, self.__main_screen, lista_teclas, lista_teclado_un_click, self.__floor_y_coord)
         self.enemies.update(delta_ms, self.__main_screen, self.__floor_y_coord)
+        self.__explotions_group.update(self.__main_screen)
+        self.player.update(delta_ms, self.__main_screen, lista_teclas, lista_teclado_un_click, self.__floor_y_coord)
         self.__check_collide()
         self.__play_music()
         # self.__check_hp_boss()
