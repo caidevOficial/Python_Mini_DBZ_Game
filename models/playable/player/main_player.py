@@ -32,7 +32,7 @@ import pygame.mixer as mixer
 
 class Player(pg.sprite.Sprite):
 
-    def __init__(self, screen: pg.surface.Surface, coord_x, coord_y, frame_rate = 100, speed_walk = 6, speed_run = 12, gravity = 16, jump = 32):
+    def __init__(self, screen: pg.surface.Surface, coord_x, coord_y, frame_rate = 100, speed_walk = 18, speed_run = 36, gravity = 16, jump = 32):
         super().__init__()
         mixer.init()
         self.__player_control = False
@@ -75,7 +75,6 @@ class Player(pg.sprite.Sprite):
         self.rect = self.__actual_img_animation.get_rect()
         self.rect.x = coord_x
         self.rect.y = coord_y
-        self.__is_looking_right = True
         self.__bullet_group = pg.sprite.Group()
         self.__puntaje = 0
         self.__metrics.score_gained = 0
@@ -86,6 +85,7 @@ class Player(pg.sprite.Sprite):
         self.__y_start_jump = 0
         self.rect_ground_collision = pg.Rect(self.rect.x+100,self.rect.y+10 + self.rect.h-50,self.rect.w/3,10 )
         self.__gravity_vel_y = 0
+        self.__is_looking_right = True
         self.__is_charging = False
         self.__is_transformed = False
         self.__is_charging_kame = False
@@ -166,6 +166,10 @@ class Player(pg.sprite.Sprite):
     @property
     def get_blasts(self):
         return self.__bullet_group
+
+    @property
+    def is_charging_energy(self) -> bool:
+        return self.__is_charging
 
     def __check_can_shoot(self, attack_type: str) -> bool:
         attack_cost = 0
@@ -348,6 +352,7 @@ class Player(pg.sprite.Sprite):
             self.actual_mana_points = 8
             # print(self.__actual_mp, self.__mana_bar.actual_amount)
             if not self.__is_charging and charge:
+                print('carga')
                 if self.__actual_animation != self.__charge_l and self.__actual_animation != self.__charge_r:
                     self.__is_charging = True
                     if self.__is_looking_right:
@@ -361,11 +366,14 @@ class Player(pg.sprite.Sprite):
                     self.__move_y = 0
             else: 
                 self.__is_charging = False
+                print('no carga')
         else:
             self.__sound_player(self.__sound_fx[0], 'stop', 0.3)
     
     def walk(self, direction: str = 'Right'):
-        if self.__player_control:
+        if self.__player_control and\
+            self.__actual_animation not in (self.__walk_r, self.__walk_l) :
+            print('Cambio animacion de walk')
             match direction:
                 case 'Right':
                     look_right = True
@@ -375,7 +383,8 @@ class Player(pg.sprite.Sprite):
                     self.__set_x_animations_preset(-self.__speed_walk, self.__walk_l, look_r=look_right)
     
     def run(self, direction: str = 'Right'):
-        if self.__player_control:
+        if self.__player_control and\
+            self.__actual_animation not in (self.__run_r, self.__run_l):
             self.__initial_frame = 0
             match direction:
                 case 'Right':
@@ -387,7 +396,7 @@ class Player(pg.sprite.Sprite):
     
     def stay(self):
         if self.__player_control:
-            if self.__actual_animation != self.__iddle_l and self.__actual_animation != self.__iddle_r:
+            if self.__actual_animation not in (self.__iddle_l, self.__iddle_r):
                 self.change_animation(self.__iddle_r) if self.__is_looking_right else  self.change_animation(self.__iddle_l)
                 self.__move_x = 0
                 self.__move_y = 0
