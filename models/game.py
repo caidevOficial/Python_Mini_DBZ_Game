@@ -28,12 +28,10 @@ from models.constantes import (
 from models.playable.player.main_player import Player
 from models.stage import Stage
 from models.video_player.pyvidplayer import Video
-from models.module_installer import ModuleInstaller
 
 class Game:
 
     def __init__(self) -> None:
-        ModuleInstaller.run_command()
         self.__executing = True
         self.__screen_surface = pg.display.set_mode((ANCHO_VENTANA, ALTO_VENTANA))
         pg.init()

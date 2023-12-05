@@ -24,9 +24,8 @@ import pygame as pg
 from models.surface_manager import SurfaceManager as sf
 
 class Explotion(pg.sprite.Sprite):
-    def __init__(self, center, dimentions: tuple):
+    def __init__(self, center):
         super().__init__()
-        self.__dimentions = dimentions
         self._actual_frame = 0
         self.__actual_animation = sf.get_surface_from_spritesheet('./assets/img/blast/explotion_blast.png', 8, 1, scale_2x=True)
         self.image = self.__actual_animation[self._actual_frame]

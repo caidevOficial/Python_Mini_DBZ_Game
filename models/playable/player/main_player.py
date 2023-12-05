@@ -585,5 +585,3 @@ class Player(pg.sprite.Sprite):
         self.__mana_bar.update(screen, self.rect.x -2, self.rect.y-10, self.__mana_bar.actual_amount)
         self.__bullet_group.update(screen)
         self.draw(screen)
-    
-    

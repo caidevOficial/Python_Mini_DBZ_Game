@@ -115,7 +115,7 @@ class Stage:
 
     def __add_explotion(self, enemy_rect: pg.rect.Rect):
         self.__explotions_group.add(
-            Explotion(enemy_rect.center, None)
+            Explotion(enemy_rect.center)
         )
 
     def __check_collide(self):
