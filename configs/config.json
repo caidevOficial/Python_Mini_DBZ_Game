@@ -2,6 +2,7 @@
     "stage_1": {
         "score_multiplier": 2,
         "difficult_level": [],
+        "time_seconds": 40,
         "scenario": {
             "stage_name": "NIVEL 1",
             "background": "./assets/img/background/goku_house.png",
@@ -13,7 +14,8 @@
             "enemies_configs": {
                 "enemy_min_hp": 100,
                 "enemy_max_hp": 300,
-                "sprites":{
+                "enemies_score": 100,
+            "sprites":{
                     "walk": {
                         "path": "./assets/img/enemy/a16/walk/walk.png",
                         "amount_images": 1
@@ -67,6 +69,7 @@
     "stage_2": {
         "score_multiplier": 4,
         "difficult_level": [],
+        "time_seconds": 60,
         "scenario": {
             "stage_name": "NIVEL 2",
             "background": "./assets/img/background/tournament.jpg",
@@ -78,6 +81,7 @@
             "enemies_configs": {
                 "enemy_min_hp": 100,
                 "enemy_max_hp": 300,
+                "enemies_score": 200,
                 "sprites":{
                     "walk": {
                         "path": "./assets/img/enemy/cell_jr/walk/walk.png",
@@ -147,6 +151,7 @@
                 "max_boss_hp_left": 300
             }
         ],
+        "time_seconds": 120,
         "scenario": {
             "stage_name": "NIVEL 3",
             "background": "./assets/img/background/cell_arena.jpg",
@@ -158,6 +163,7 @@
             "enemies_configs": {
                 "enemy_min_hp": 2000,
                 "enemy_max_hp": 3000,
+                "enemies_score": 500,
                 "sprites":{
                     "walk": {
                         "path": "./assets/img/enemy/cell/walk/walk.png",
@@ -221,6 +227,7 @@
                 "max_boss_hp_left": 300
             }
         ],
+        "time_seconds": 240,
         "scenario": {
             "stage_name": "NIVEL 4",
             "background": "./assets/img/background/kaio_planet.png",
@@ -232,6 +239,7 @@
             "enemies_configs": {
                 "enemy_min_hp": 3000,
                 "enemy_max_hp": 5000,
+                "enemies_score": 1000,
                 "sprites":{
                     "walk": {
                         "path": "./assets/img/enemy/cell/walk/walk.png",
