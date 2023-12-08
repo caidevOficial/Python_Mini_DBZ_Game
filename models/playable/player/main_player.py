@@ -100,7 +100,7 @@ class Player(pg.sprite.Sprite):
     
     @property
     def actual_hit_points(self):
-        return self.self.__life_bar.actual_amount
+        return self.__life_bar.actual_amount
     
     @actual_hit_points.setter
     def actual_hit_points(self, hit_points):

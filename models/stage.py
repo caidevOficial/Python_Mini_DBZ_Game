@@ -41,6 +41,7 @@ class Stage:
         self.__limit_h = limit_h
         self.__main_screen = screen
         self.__win = False
+        self.__lose = False
         self.__explotions_group = pg.sprite.Group()
         self.player = pg.sprite.GroupSingle(self.player_sprite)
         self.enemies = pg.sprite.Group()
@@ -65,6 +66,8 @@ class Stage:
         self.__spawn_enemy()
         self.__set_fonts()
         self.__time_left = self.__stage_configs.get('time_seconds')
+        self.__minutes_left = 500
+        self.__seconds_left = 500
         self.__actual_time = pg.time.get_ticks()
         self.__time_display = ''
 
@@ -79,9 +82,24 @@ class Stage:
     def __set_fonts(self):
         self.__text_font = pg.font.Font("./assets/fonts/Saiyan-Sans.ttf", 32)
         self.__number_font = pg.font.Font("./assets/fonts/namco.ttf", 18)
-        self.__main_font = pg.font.Font("./assets/fonts/Saiyan-Sans.ttf", 64)
+        self.__main_font = pg.font.Font("./assets/fonts/Saiyan-Sans.ttf", 128)
         self.__time_text = pg.font.Font("./assets/fonts/Halimount.otf", 32)
         #self.__fuente_negrita_inclinada = pg.font.Font("./assets/fonts/", 72)
+
+    def __configure_lose_box(self, ):
+        text_you = pg.surface.Surface = self.__main_font.render('you ', True, DBZ_YELLOW)
+        text_failed = self.__main_font.render('failed', True, DBZ_RED)
+        center_width_box = text_you.get_width() + text_failed.get_width()
+        center_height_box = max(text_you.get_height(), text_failed.get_height())
+        center_text_box_x = (ANCHO_VENTANA - center_width_box) // 2
+        center_text_box_y = (ALTO_VENTANA - center_height_box) // 2
+        center_text_x1 = center_text_box_x
+        center_text_y1 = center_text_box_y
+        center_text_x2 = center_text_x1 + text_you.get_width()
+        center_text_y2 = center_text_box_y
+        pg.draw.rect(self.__main_screen, DBZ_BLACK, (center_text_box_x, center_text_box_y, center_width_box, center_height_box))
+        self.__main_screen.blit(text_you, (center_text_x1, center_text_y1))
+        self.__main_screen.blit(text_failed, (center_text_x2, center_text_y2))
 
     def __render_text(self):
         score_text: pg.surface.Surface = self.__text_font.render('Score: ', True, DBZ_YELLOW)
@@ -89,6 +107,8 @@ class Stage:
         tiempo_text = self.__time_text.render(f"Time: {self.__time_display}", True, DBZ_ORANGE)
         width_box = score_text.get_width() + score_number.get_width()
         height_box = max(score_text.get_height(), score_number.get_height())
+        if self.__lose:
+            self.__configure_lose_box()
         
         # Esquina superior izquierda de la caja
         #caja_texto_x = (ANCHO_VENTANA - width_box) // 2
@@ -127,7 +147,14 @@ class Stage:
     def check_win(self) -> bool:
         match self.__stage_name:
             case 'stage_1' | 'stage_2' | 'stage_3' | 'stage_4':
-                self.__win = len(self.enemies) == 0
+                self.__win = len(self.enemies) == 0\
+                and self.__minutes_left >= 0 and self.__seconds_left >= 0
+    
+    def check_lose(self):
+        match self.__stage_name:
+            case 'stage_1' | 'stage_2' | 'stage_3' | 'stage_4':
+                self.__lose = self.player_sprite.actual_hit_points <= 0\
+                or self.__minutes_left == 0 and self.__seconds_left == 0
 
     def stage_passed(self):
         if self.__win:
@@ -190,14 +217,13 @@ class Stage:
         if self.__time_left >= 0:
             current_time = pg.time.get_ticks()
             if current_time - self.__actual_time >= 1000:
-                min, sec = divmod(self.__time_left, 60)
-                self.__time_display = f'{min:02.0f}:{sec:02.0f}'
+                self.__minutes_left, self.__seconds_left = divmod(self.__time_left, 60)
+                self.__time_display = f'{self.__minutes_left:02.0f}:{self.__seconds_left:02.0f}'
                 self.__actual_time = current_time
                 self.__time_left -= 1
 
     def run(self, delta_ms, lista_teclas, lista_teclado_un_click):
         self.__update_time()
-        self.__render_text()
         self.enemies.update(delta_ms, self.__main_screen, self.__floor_y_coord)
         self.__explotions_group.update(self.__main_screen)
         self.player.update(delta_ms, self.__main_screen, lista_teclas, lista_teclado_un_click, self.__floor_y_coord)
@@ -205,3 +231,5 @@ class Stage:
         self.__play_music()
         # self.__check_hp_boss()
         self.check_win()
+        self.check_lose()
+        self.__render_text()
