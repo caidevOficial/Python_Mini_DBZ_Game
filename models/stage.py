@@ -25,6 +25,10 @@ import pygame as pg
 from models.playable.player.main_player import Player
 from models.enemy import Enemy
 from models.explotion import Explotion
+from models.constantes import (
+    ANCHO_VENTANA, ALTO_VENTANA, DBZ_BLACK, 
+    TRANSPARENT, DBZ_RED, DBZ_YELLOW, DBZ_ORANGE
+)
 
 class Stage:
 
@@ -43,7 +47,6 @@ class Stage:
         self.items = pg.sprite.Group()
         self.__get_configs()
         self.__floor_y_coord = self.__stage_configs.get('scenario').get('ground_y_coord_level')
-        self.__score_added = False
         
         self.__enemies_coords: list[dict] = self.__stage_configs.get('enemies').get('enemies_coords')
         self.__enemies_configs: dict = self.__stage_configs.get('enemies').get('enemies_configs')
@@ -60,6 +63,10 @@ class Stage:
         self.__playing_sound = False
         self.__music_stage = pg.mixer.Sound(self.__stage_configs.get('scenario').get('background_music'))
         self.__spawn_enemy()
+        self.__set_fonts()
+        self.__time_left = self.__stage_configs.get('time_seconds')
+        self.__actual_time = pg.time.get_ticks()
+        self.__time_display = ''
 
     @property
     def stage_name(self):
@@ -69,22 +76,53 @@ class Stage:
     def bkg_img(self) -> pg.surface.Surface:
         return self.__bgd_scaled_img
 
+    def __set_fonts(self):
+        self.__text_font = pg.font.Font("./assets/fonts/Saiyan-Sans.ttf", 32)
+        self.__number_font = pg.font.Font("./assets/fonts/namco.ttf", 18)
+        self.__main_font = pg.font.Font("./assets/fonts/Saiyan-Sans.ttf", 64)
+        self.__time_text = pg.font.Font("./assets/fonts/Halimount.otf", 32)
+        #self.__fuente_negrita_inclinada = pg.font.Font("./assets/fonts/", 72)
+
+    def __render_text(self):
+        score_text: pg.surface.Surface = self.__text_font.render('Score: ', True, DBZ_YELLOW)
+        score_number = self.__number_font.render(f'{self.player_sprite.puntaje}', True, DBZ_RED)
+        tiempo_text = self.__time_text.render(f"Time: {self.__time_display}", True, DBZ_ORANGE)
+        width_box = score_text.get_width() + score_number.get_width()
+        height_box = max(score_text.get_height(), score_number.get_height())
+        
+        # Esquina superior izquierda de la caja
+        #caja_texto_x = (ANCHO_VENTANA - width_box) // 2
+        # caja_texto_y = (ALTO_VENTANA - height_box) // 2
+        caja_texto_x = 10
+        caja_texto_y = 10
+
+        pg.draw.rect(self.__main_screen, DBZ_BLACK, (caja_texto_x, caja_texto_y, width_box, height_box))
+
+        x1 = caja_texto_x
+        y1 = caja_texto_y
+
+        x2 = x1 + score_text.get_width()
+        y2 = caja_texto_y + 5
+
+        x3_time = (ANCHO_VENTANA //2 - tiempo_text.get_width() // 2)
+
+        self.__main_screen.blit(score_text, (x1, y1))
+        self.__main_screen.blit(score_number, (x2, y2))
+        self.__main_screen.blit(tiempo_text, (x3_time, y1))
+
     def __get_configs(self):
         with open('./configs/config.json', 'r') as configs:
             self.__stage_configs = json.load(configs)[self.__stage_name]
-            #print(self.__stage_configs)
 
     def __spawn_enemy(self):
-        for i in range(self.__enemies_amount):
+        amount = len(self.__enemies_coords)\
+            if len(self.__enemies_coords) > self.__enemies_amount\
+            else self.__enemies_amount
+        for i in range(amount):
             coord = self.__enemies_coords[i]
             self.enemies.add(
                 Enemy(coord.get('x'), coord.get('y'), self.__enemies_configs)
             )
-
-    # def __check_hp_boss(self):
-    #     match self.enemies[0]:
-    #         case 500:
-    #             self.enemies[0].attack_power += self.__multipliers[1].get("multiplicador")
 
     def check_win(self) -> bool:
         match self.__stage_name:
@@ -96,11 +134,18 @@ class Stage:
             self.__stop_music()
         return self.__win
 
-    def __asignar_puntajes_a_jugador(self, enemigos_antes: int, enemigos_despues: int):
-        if not self.__score_added and enemigos_antes > enemigos_despues:
-            self.player_sprite.puntaje += (enemigos_antes - enemigos_despues) * self.__score_multiplier
+    def __asignar_puntajes_a_jugador(self, enemy: Enemy):
+        print(f'Puntaje: {enemy.enemy_score} | Multiplicador: {self.__score_multiplier}')
+        puntaje = enemy.enemy_score * self.__score_multiplier
+        print(f'Total a asignar: {puntaje}')
+        print(f'Puntaje actual: {self.player_sprite.puntaje}')
+        self.player_sprite.puntaje = puntaje
+        print(f'Puntaje Nuevo: {self.player_sprite.puntaje}')
 
     def __play_music(self):
+        """
+        The function plays music with different volume levels depending on the stage name.
+        """
         if not self.__playing_sound:
             self.__playing_sound = True
             self.__music_stage.set_volume(0.35)
@@ -109,31 +154,50 @@ class Stage:
             self.__music_stage.play(loops=-1, fade_ms=900)
     
     def __stop_music(self):
+        """
+        The function stops the currently playing music by fading it out.
+        """
         if self.__playing_sound and self.__win:
             self.__playing_sound = False
             self.__music_stage.fadeout(150)
 
     def __add_explotion(self, enemy_rect: pg.rect.Rect):
+        """
+        The function adds an explosion to a group of explosions at the center of an enemy's rectangle.
+        
+        :param enemy_rect: enemy_rect is a parameter of type pg.rect.Rect. It represents the rectangle
+        that defines the position and size of an enemy object
+        :type enemy_rect: pg.rect.Rect
+        """
         self.__explotions_group.add(
             Explotion(enemy_rect.center)
         )
 
     def __check_collide(self):
         for blast in self.player_sprite.get_blasts:
-            cantidad_enemigos_antes = len(self.enemies)
             for enemy in self.enemies:
                 if pg.sprite.collide_rect(blast, enemy):
                     self.__add_explotion(enemy.rect)
+                    self.__asignar_puntajes_a_jugador(enemy)
                     blast.kill()
                     enemy.kill()
-                    cantidad_enemigos_despues = len(self.enemies)
-                    self.__asignar_puntajes_a_jugador(cantidad_enemigos_antes, cantidad_enemigos_despues)
             
             # pg.sprite.spritecollide(blast, self.enemies, True)
             # if cantidad_enemigos_antes > cantidad_enemigos_despues:
             #     blast.kill()
     
+    def __update_time(self):
+        if self.__time_left >= 0:
+            current_time = pg.time.get_ticks()
+            if current_time - self.__actual_time >= 1000:
+                min, sec = divmod(self.__time_left, 60)
+                self.__time_display = f'{min:02.0f}:{sec:02.0f}'
+                self.__actual_time = current_time
+                self.__time_left -= 1
+
     def run(self, delta_ms, lista_teclas, lista_teclado_un_click):
+        self.__update_time()
+        self.__render_text()
         self.enemies.update(delta_ms, self.__main_screen, self.__floor_y_coord)
         self.__explotions_group.update(self.__main_screen)
         self.player.update(delta_ms, self.__main_screen, lista_teclas, lista_teclado_un_click, self.__floor_y_coord)

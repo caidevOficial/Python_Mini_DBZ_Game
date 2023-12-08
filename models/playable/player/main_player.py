@@ -161,7 +161,7 @@ class Player(pg.sprite.Sprite):
     
     @puntaje.setter
     def puntaje(self, puntos: int):
-        self.__metrics.score_gained += puntos
+        self.__metrics.score_gained = puntos
     
     @property
     def get_blasts(self):
@@ -373,7 +373,6 @@ class Player(pg.sprite.Sprite):
     def walk(self, direction: str = 'Right'):
         if self.__player_control and\
             self.__actual_animation not in (self.__walk_r, self.__walk_l) :
-            print('Cambio animacion de walk')
             match direction:
                 case 'Right':
                     look_right = True
@@ -470,7 +469,6 @@ class Player(pg.sprite.Sprite):
             self.actual_mana_points = -self.__kame_energy_cost
             self.__kame_shoot_time = pg.time.get_ticks()
 
-    
     def __check_is_fully_charged(self):
         current_time = pg.time.get_ticks()
         ready_to_shoot = current_time - self.__kame_charge_init_time >= self.__kame_fully_charged_time

@@ -43,6 +43,7 @@ class Enemy(pg.sprite.Sprite):
         self.__bullet_group = pg.sprite.Group()
         self.__move_x = 0
         self.__move_y = 0
+        self.__score = int(self.__configs.get('enemies_score'))
         self.__speed_walk = speed_walk
         self.__speed_run = speed_run
         self.__frame_rate = frame_rate
@@ -69,6 +70,10 @@ class Enemy(pg.sprite.Sprite):
     @hp_left.setter
     def hp_left(self, hp):
         self.__hp += hp
+    
+    @property
+    def enemy_score(self) -> int:
+        return self.__score
 
     def cambiar_animacion(self, nueva_animacion: list[pg.surface.Surface]):
         self.__actual_animation = nueva_animacion
