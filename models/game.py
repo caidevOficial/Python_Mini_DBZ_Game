@@ -22,7 +22,7 @@
 
 import json
 import pygame as pg
-from models.constantes import (
+from models.constants import (
     ALTO_VENTANA, ANCHO_VENTANA, FPS, DEBUG
 )
 from models.playable.player.main_player import Player
@@ -126,6 +126,9 @@ class Game:
                         print('Estoy CERRANDO el JUEGO')
                         self.__executing = False
                         break
+                    case pg.MOUSEBUTTONDOWN:
+                        message = f'Click coords: {event.pos}'
+                        print(message)
             
             key_pressed_list = pg.key.get_pressed()
             self.__screen_surface.blit(self.__actual_stage.bkg_img, self.__actual_stage.bkg_img.get_rect())

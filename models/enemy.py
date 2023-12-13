@@ -22,7 +22,7 @@
 
 from models.surface_manager import SurfaceManager as sf
 import pygame as pg
-from models.constantes import ANCHO_VENTANA, ALTO_VENTANA
+from models.constants import ANCHO_VENTANA, ALTO_VENTANA
 from models.hit_points.class_vida import BarraVida
 import random as rd
 
