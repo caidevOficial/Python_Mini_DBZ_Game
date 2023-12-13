@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 import pygame as pg
-from models.constantes import ANCHO_VENTANA
+from models.constants import ANCHO_VENTANA
 from models.surface_manager import SurfaceManager as sf
 
 class KiBlast(pg.sprite.Sprite):

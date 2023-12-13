@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 import pygame
-from models.constantes import CYAN_CLARO, VERDE_CLARO
+from models.constants import LIGHT_CYAN, LIGHT_GREEN
 
 class BarraVida:
     def __init__(self, screen : pygame.Surface, vida_maxima : int, vida_actual: int, ancho_bar : int, alto_bar: int, pos_x : int, pos_y : int, type: str)-> None:
@@ -48,8 +48,8 @@ class BarraVida:
         
     def __create_main_bar_color(self, color: str):
         self.__main_color = color
-        if self.__main_color == 'hp': self.image_2.fill(VERDE_CLARO)
-        elif self.__main_color == 'mp': self.image_2.fill(CYAN_CLARO)
+        if self.__main_color == 'hp': self.image_2.fill(LIGHT_GREEN)
+        elif self.__main_color == 'mp': self.image_2.fill(LIGHT_CYAN)
 
     def draw(self, screen : pygame.Surface)-> None:
         screen.blit(self.image, self.rect)# rojo - barra de atras
@@ -77,6 +77,6 @@ class BarraVida:
         self.ancho_bar_2 = self.vida_actual * 100 / self.vida_maxima
         #if(self.image_2.get_width() > 0):
         self.image_2 = pygame.Surface((self.ancho_bar_2, self.alto))
-        if self.__main_color == 'hp': self.image_2.fill(VERDE_CLARO)
-        elif self.__main_color == 'mp': self.image_2.fill(CYAN_CLARO)
+        if self.__main_color == 'hp': self.image_2.fill(LIGHT_GREEN)
+        elif self.__main_color == 'mp': self.image_2.fill(LIGHT_CYAN)
         self.draw(screen)

@@ -25,10 +25,12 @@ import pygame as pg
 from models.playable.player.main_player import Player
 from models.enemy import Enemy
 from models.explotion import Explotion
-from models.constantes import (
+from models.platform import Platform
+from models.constants import (
     ANCHO_VENTANA, ALTO_VENTANA, DBZ_BLACK, 
     TRANSPARENT, DBZ_RED, DBZ_YELLOW, DBZ_ORANGE
 )
+from models.replacer import Replacer
 
 class Stage:
 
@@ -46,6 +48,7 @@ class Stage:
         self.player = pg.sprite.GroupSingle(self.player_sprite)
         self.enemies = pg.sprite.Group()
         self.items = pg.sprite.Group()
+        self.platforms = pg.sprite.Group()
         self.__get_configs()
         self.__floor_y_coord = self.__stage_configs.get('scenario').get('ground_y_coord_level')
         
@@ -53,6 +56,9 @@ class Stage:
         self.__enemies_configs: dict = self.__stage_configs.get('enemies').get('enemies_configs')
         self.__enemies_amount = self.__stage_configs.get('enemies').get('enemies_amount')
         self.__score_multiplier = self.__stage_configs.get('score_multiplier')
+        
+        self.__platforms_coords: list[dict] = self.__stage_configs.get('platforms')
+
         self.__bgd_img = pg.image.load(self.__stage_configs.get('scenario').get('background'))
         self.__bgd_scaled_img = pg.transform.scale(self.__bgd_img, (self.__limit_w, self.__limit_h))
         self.__player_presets = self.__stage_configs.get('player')
@@ -64,6 +70,7 @@ class Stage:
         self.__playing_sound = False
         self.__music_stage = pg.mixer.Sound(self.__stage_configs.get('scenario').get('background_music'))
         self.__spawn_enemy()
+        self.__spawn_platforms()
         self.__set_fonts()
         self.__time_left = self.__stage_configs.get('time_seconds')
         self.__minutes_left = 500
@@ -131,10 +138,15 @@ class Stage:
         self.__main_screen.blit(tiempo_text, (x3_time, y1))
 
     def __get_configs(self):
-        with open('./configs/config.json', 'r') as configs:
-            self.__stage_configs = json.load(configs)[self.__stage_name]
+        replacer = Replacer(self.__stage_name)
+        # with open('./configs/config.json', 'r') as configs:
+        #     self.__stage_configs = json.load(configs)[self.__stage_name]
+        self.__stage_configs = replacer.configs
 
     def __spawn_enemy(self):
+        """
+        The function spawns enemies based on the given coordinates and enemy configurations.
+        """
         amount = len(self.__enemies_coords)\
             if len(self.__enemies_coords) > self.__enemies_amount\
             else self.__enemies_amount
@@ -142,6 +154,15 @@ class Stage:
             coord = self.__enemies_coords[i]
             self.enemies.add(
                 Enemy(coord.get('x'), coord.get('y'), self.__enemies_configs)
+            )
+
+    def __spawn_platforms(self):
+        """
+        The function spawns platforms based on the given platform coordinates.
+        """
+        for platform_data in self.__platforms_coords:
+            self.platforms.add(
+                Platform(**platform_data)
             )
 
     def check_win(self) -> bool:
@@ -225,6 +246,7 @@ class Stage:
     def run(self, delta_ms, lista_teclas, lista_teclado_un_click):
         self.__update_time()
         self.enemies.update(delta_ms, self.__main_screen, self.__floor_y_coord)
+        self.platforms.update(self.__main_screen)
         self.__explotions_group.update(self.__main_screen)
         self.player.update(delta_ms, self.__main_screen, lista_teclas, lista_teclado_un_click, self.__floor_y_coord)
         self.__check_collide()

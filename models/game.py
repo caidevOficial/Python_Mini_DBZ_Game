@@ -22,7 +22,7 @@
 
 import json
 import pygame as pg
-from models.constantes import (
+from models.constants import (
     ALTO_VENTANA, ANCHO_VENTANA, FPS, DEBUG
 )
 from models.playable.player.main_player import Player

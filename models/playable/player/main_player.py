@@ -22,7 +22,7 @@
 
 from models.surface_manager import SurfaceManager as sf
 import pygame as pg
-from models.constantes import ANCHO_VENTANA, DEBUG
+from models.constants import ANCHO_VENTANA, DEBUG
 from models.hit_points.class_vida import BarraVida
 from models.playable.player.metricas import Metrics
 from models.blasts.ki_blast import KiBlast

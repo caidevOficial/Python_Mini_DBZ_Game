@@ -60,6 +60,15 @@
                 {"x": 40, "y": 120}
             ]
         },
+        "platforms": [
+            {
+                "image_path": "",
+                "x_axis": 0,
+                "y_axis": 402,
+                "width": "ANCHO_VENTANA",
+                "height": 5
+            }
+        ],
         "player": {
             "hp": 500,
             "mp": 800,
@@ -129,6 +138,15 @@
                 {"x": 40, "y": 120}
             ]
         },
+        "platforms": [
+            {
+                "image_path": "",
+                "x_axis": 0,
+                "y_axis": 522,
+                "width": "ANCHO_VENTANA",
+                "height": 5
+            }
+        ],
         "player": {
             "hp": 500,
             "mp": 800,
@@ -205,6 +223,15 @@
                 {"x": 40, "y": 120}
             ]
         },
+        "platforms": [
+            {
+                "image_path": "",
+                "x_axis": 0,
+                "y_axis": 502,
+                "width": "ANCHO_VENTANA",
+                "height": 5
+            }
+        ],
         "player": {
             "hp": 1500,
             "mp": 1500,
@@ -281,6 +308,15 @@
                 {"x": 40, "y": 120}
             ]
         },
+        "platforms": [
+            {
+                "image_path": "",
+                "x_axis": 0,
+                "y_axis": 542,
+                "width": "ANCHO_VENTANA",
+                "height": 5
+            }
+        ],
         "player": {
             "hp": 3000,
             "mp": 3000,
