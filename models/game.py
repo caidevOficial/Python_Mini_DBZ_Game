@@ -23,7 +23,7 @@
 import json
 import pygame as pg
 from models.constants import (
-    ALTO_VENTANA, ANCHO_VENTANA, FPS, DEBUG
+    ALTO_VENTANA, ANCHO_VENTANA, FPS, debug
 )
 from models.playable.player.main_player import Player
 from models.stage import Stage
@@ -54,16 +54,14 @@ class Game:
         vid_1.set_size((ancho, alto))
         vid_1.set_volume(0.3)
         self.__video_initial_time = int(pg.time.get_ticks() / 1000)
-        if not self.__video_length_time:
-            self.__video_length_time = vid_1.duration
-            if DEBUG:
-                print(f'Duracion del video: {self.__video_length_time} segundos')
-                print(f'El video inicio en: {self.__video_initial_time} segundos de haber comenzado el juego')
+        self.__video_length_time = vid_1.duration
+        if debug.get('actual_status'):
+            print(f'Duracion del video: {self.__video_length_time} segundos')
+            print(f'El video inicio en: {self.__video_initial_time} segundos de haber comenzado el juego')
 
         running = True
-        while running:
+        while running and self.__executing:
             if vid_1.active:
-                
                 vid_1.set_volume(0.9)
                 vid_1.draw(self.__screen_surface, (0, 0))
             else:
@@ -76,7 +74,10 @@ class Game:
             
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    pg.quit()
+                    vid_1.close()
+                    self.__executing = False
+                    running = False
+                    break
                 if event.type == pg.MOUSEBUTTONDOWN:
                     vid_1.close()
                     running = False
@@ -87,7 +88,7 @@ class Game:
         if self.__actual_stage:
             match self.__actual_stage.stage_name:
                 case 'stage_1':
-                    pg.display.set_caption('Saga de Andriodes')
+                    pg.display.set_caption('Saga de Androides')
                 case 'stage_2':
                     pg.display.set_caption('Inicio Saga de Cell')
                 case 'stage_3':
@@ -117,6 +118,8 @@ class Game:
                     self.__actual_stage.stage_name == 'stage_4' and not self.__is_playing_last_video:
                     self.__is_playing_last_video = True
                     self.__play_video_transition(self.__end_transition_vid_path,  ANCHO_VENTANA, ALTO_VENTANA, delta_ms)
+                    self.__executing = False
+                    break
 
             #print(delta_ms)
             events_list = pg.event.get()
@@ -129,6 +132,10 @@ class Game:
                     case pg.MOUSEBUTTONDOWN:
                         message = f'Click coords: {event.pos}'
                         print(message)
+                    case pg.KEYDOWN:
+                        if event.key == pg.K_z:
+                            import models.constants as const
+                            const.debug['actual_status'] = not const.debug['actual_status']
             
             key_pressed_list = pg.key.get_pressed()
             self.__screen_surface.blit(self.__actual_stage.bkg_img, self.__actual_stage.bkg_img.get_rect())

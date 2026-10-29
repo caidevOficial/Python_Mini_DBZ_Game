@@ -24,6 +24,6 @@ if __name__ == '__main__':
     from models.module_installer import ModuleInstaller
     from models.game import Game
 
-    ModuleInstaller.run_command()
+    # ModuleInstaller.run_command()
     actual_game = Game()
     actual_game.run_game()

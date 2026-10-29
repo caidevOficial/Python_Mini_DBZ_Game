@@ -2,20 +2,22 @@
     "stage_1": {
         "score_multiplier": 2,
         "difficult_level": [],
-        "time_seconds": 40,
+        "time_seconds": 120,
+        "ki_blast_damage": 50,
+        "kame_damage": 500,
         "scenario": {
             "stage_name": "NIVEL 1",
             "background": "./assets/img/background/goku_house.png",
-            "ground_y_coord_level": 20,
+            "ground_y_coord_level": 402,
             "background_music": "./assets/music/stage_1_bkg_music.mp3"
         },
         "enemies": {
             "enemies_amount": 2,
             "enemies_configs": {
-                "enemy_min_hp": 100,
-                "enemy_max_hp": 300,
+                "enemy_min_hp": 500,
+                "enemy_max_hp": 500,
                 "enemies_score": 100,
-            "sprites":{
+                "sprites": {
                     "walk": {
                         "path": "./assets/img/enemy/a16/walk/walk.png",
                         "amount_images": 1
@@ -35,29 +37,74 @@
                 }
             },
             "enemies_coords": [
-                {"x": 80, "y": 320},
-                {"x": 120, "y": 320},
-                {"x": 190, "y": 320},
-                {"x": 210, "y": 320},
-                {"x": 350, "y": 320}
+                {
+                    "x": 80,
+                    "y": 320
+                },
+                {
+                    "x": 120,
+                    "y": 320
+                },
+                {
+                    "x": 190,
+                    "y": 320
+                },
+                {
+                    "x": 210,
+                    "y": 320
+                },
+                {
+                    "x": 350,
+                    "y": 320
+                }
             ]
         },
         "items": {
             "items_coords": [
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120}
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                }
             ]
         },
         "traps": {
             "traps_coords": [
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120}
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                }
             ]
         },
         "platforms": [
@@ -71,7 +118,14 @@
             {
                 "image_path": "",
                 "x_axis": 398,
-                "y_axis": 222,
+                "y_axis": 275,
+                "width": 100,
+                "height": 10
+            },
+            {
+                "image_path": "",
+                "x_axis": 600,
+                "y_axis": 275,
                 "width": 100,
                 "height": 10
             }
@@ -79,26 +133,33 @@
         "player": {
             "hp": 500,
             "mp": 800,
-            "coords": {"x": 40, "y": 290}
+            "coords": {
+                "x": 40,
+                "y": 290
+            },
+            "ki_blast_damage": 50,
+            "kame_damage": 500
         }
     },
     "stage_2": {
         "score_multiplier": 4,
         "difficult_level": [],
-        "time_seconds": 60,
+        "time_seconds": 240,
+        "ki_blast_damage": 100,
+        "kame_damage": 1000,
         "scenario": {
             "stage_name": "NIVEL 2",
             "background": "./assets/img/background/tournament.jpg",
-            "ground_y_coord_level": 400,
+            "ground_y_coord_level": 522,
             "background_music": "./assets/music/stage_2_bkg_music.mp3"
         },
         "enemies": {
             "enemies_amount": 7,
             "enemies_configs": {
-                "enemy_min_hp": 100,
-                "enemy_max_hp": 300,
+                "enemy_min_hp": 2000,
+                "enemy_max_hp": 2000,
                 "enemies_score": 200,
-                "sprites":{
+                "sprites": {
                     "walk": {
                         "path": "./assets/img/enemy/cell_jr/walk/walk.png",
                         "amount_images": 1
@@ -118,31 +179,82 @@
                 }
             },
             "enemies_coords": [
-                {"x": 80, "y": 450},
-                {"x": 120, "y": 450},
-                {"x": 190, "y": 450},
-                {"x": 210, "y": 455},
-                {"x": 350, "y": 455},
-                {"x": 450, "y": 455},
-                {"x": 650, "y": 455}
+                {
+                    "x": 80,
+                    "y": 450
+                },
+                {
+                    "x": 120,
+                    "y": 450
+                },
+                {
+                    "x": 190,
+                    "y": 450
+                },
+                {
+                    "x": 210,
+                    "y": 455
+                },
+                {
+                    "x": 350,
+                    "y": 455
+                },
+                {
+                    "x": 450,
+                    "y": 455
+                },
+                {
+                    "x": 650,
+                    "y": 455
+                }
             ]
         },
         "items": {
             "items_coords": [
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120}
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                }
             ]
         },
         "traps": {
             "traps_coords": [
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120}
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                }
             ]
         },
         "platforms": [
@@ -185,7 +297,12 @@
         "player": {
             "hp": 500,
             "mp": 800,
-            "coords": {"x": 40, "y": 410}
+            "coords": {
+                "x": 40,
+                "y": 410
+            },
+            "ki_blast_damage": 100,
+            "kame_damage": 1000
         }
     },
     "stage_3": {
@@ -204,20 +321,22 @@
                 "max_boss_hp_left": 300
             }
         ],
-        "time_seconds": 120,
+        "time_seconds": 240,
+        "ki_blast_damage": 500,
+        "kame_damage": 5000,
         "scenario": {
             "stage_name": "NIVEL 3",
             "background": "./assets/img/background/cell_arena.jpg",
-            "ground_y_coord_level": 390,
+            "ground_y_coord_level": 502,
             "background_music": "./assets/music/stage_3_bkg_music.mp3"
         },
         "enemies": {
             "enemies_amount": 1,
             "enemies_configs": {
-                "enemy_min_hp": 2000,
-                "enemy_max_hp": 3000,
+                "enemy_min_hp": 10000,
+                "enemy_max_hp": 10000,
                 "enemies_score": 500,
-                "sprites":{
+                "sprites": {
                     "walk": {
                         "path": "./assets/img/enemy/cell/walk/walk.png",
                         "amount_images": 1
@@ -237,25 +356,58 @@
                 }
             },
             "enemies_coords": [
-                {"x": 600, "y": 410}
+                {
+                    "x": 600,
+                    "y": 410
+                }
             ]
         },
         "items": {
             "items_coords": [
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120}
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                }
             ]
         },
         "traps": {
             "traps_coords": [
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120}
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                }
             ]
         },
         "platforms": [
@@ -291,7 +443,12 @@
         "player": {
             "hp": 1500,
             "mp": 1500,
-            "coords": {"x": 40, "y": 390}
+            "coords": {
+                "x": 40,
+                "y": 390
+            },
+            "ki_blast_damage": 500,
+            "kame_damage": 5000
         }
     },
     "stage_4": {
@@ -311,19 +468,21 @@
             }
         ],
         "time_seconds": 240,
+        "ki_blast_damage": 1000,
+        "kame_damage": 10000,
         "scenario": {
             "stage_name": "NIVEL 4",
             "background": "./assets/img/background/kaio_planet.png",
-            "ground_y_coord_level": 430,
+            "ground_y_coord_level": 542,
             "background_music": "./assets/music/stage_4_bkg_music.mp3"
         },
         "enemies": {
             "enemies_amount": 1,
             "enemies_configs": {
-                "enemy_min_hp": 3000,
-                "enemy_max_hp": 5000,
+                "enemy_min_hp": 20000,
+                "enemy_max_hp": 20000,
                 "enemies_score": 1000,
-                "sprites":{
+                "sprites": {
                     "walk": {
                         "path": "./assets/img/enemy/cell/walk/walk.png",
                         "amount_images": 1
@@ -343,25 +502,58 @@
                 }
             },
             "enemies_coords": [
-                {"x": 600, "y": 450}
+                {
+                    "x": 600,
+                    "y": 450
+                }
             ]
         },
         "items": {
             "items_coords": [
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120}
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                }
             ]
         },
         "traps": {
             "traps_coords": [
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120},
-                {"x": 40, "y": 120}
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                },
+                {
+                    "x": 40,
+                    "y": 120
+                }
             ]
         },
         "platforms": [
@@ -397,7 +589,12 @@
         "player": {
             "hp": 3000,
             "mp": 3000,
-            "coords": {"x": 40, "y": 430}
+            "coords": {
+                "x": 40,
+                "y": 430
+            },
+            "ki_blast_damage": 1000,
+            "kame_damage": 10000
         }
     }
 }

@@ -21,7 +21,8 @@
 # SOFTWARE.
 
 import pygame as pg
-from models.constants import GREEN, DEBUG, TRANSPARENT
+from models.constants import GREEN, debug, TRANSPARENT
+from models.surface_manager import SurfaceManager as sf
 
 class Platform(pg.sprite.Sprite):
     def __init__(self, image_path, x_axis, y_axis, width, height):
@@ -41,8 +42,7 @@ class Platform(pg.sprite.Sprite):
         :type image_path: str
         """
         if image_path:
-            self.image = pg.transform.scale(
-                pg.image.load(image_path), (ancho, alto))
+            self.image = sf.get_surface(image_path, dimensions=(ancho, alto), convert_alpha=True)
         else:
             self.image = pg.surface.Surface(size=(ancho, alto))
 
@@ -62,7 +62,7 @@ class Platform(pg.sprite.Sprite):
         :param screen: The "screen" parameter is the surface on which the image will be drawn. It
         represents the window or screen where the game is being displayed
         """
-        if DEBUG: self.__debug_platform(screen)
+        if debug.get('actual_status'): self.__debug_platform(screen)
         screen.blit(self.image, self.rect)
 
     def update(self, screen: pg.surface.Surface):

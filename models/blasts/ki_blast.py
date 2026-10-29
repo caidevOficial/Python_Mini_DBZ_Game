@@ -25,9 +25,10 @@ from models.constants import ANCHO_VENTANA
 from models.surface_manager import SurfaceManager as sf
 
 class KiBlast(pg.sprite.Sprite):
-    def __init__(self, pos_x, pos_y, direction, img_path = False):
+    def __init__(self, pos_x, pos_y, direction, img_path = False, damage: int = 50):
         super().__init__()
         self.direction = direction
+        self.damage = damage
         self.__load_img(img_path)
         self.rect = self.image.get_rect(center=(pos_x, pos_y))
 

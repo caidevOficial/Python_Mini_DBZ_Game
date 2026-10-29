@@ -26,6 +26,7 @@ from models.playable.player.main_player import Player
 from models.enemy import Enemy
 from models.explotion import Explotion
 from models.platform import Platform
+from models.surface_manager import SurfaceManager as sf
 from models.constants import (
     ANCHO_VENTANA, ALTO_VENTANA, DBZ_BLACK, 
     TRANSPARENT, DBZ_RED, DBZ_YELLOW, DBZ_ORANGE
@@ -45,27 +46,33 @@ class Stage:
         self.__win = False
         self.__lose = False
         self.__explotions_group = pg.sprite.Group()
-        self.player = pg.sprite.GroupSingle(self.player_sprite)
+        # self.player = pg.sprite.GroupSingle(self.player_sprite)
         self.enemies = pg.sprite.Group()
         self.items = pg.sprite.Group()
         self.platforms = pg.sprite.Group()
         self.__get_configs()
+        self.__platforms_coords: list[dict] = self.__stage_configs.get('platforms')
         self.__floor_y_coord = self.__stage_configs.get('scenario').get('ground_y_coord_level')
-        
+        if (self.__floor_y_coord is None or self.__floor_y_coord < 50) and self.__platforms_coords:
+            self.__floor_y_coord = self.__platforms_coords[0].get('y_axis')
+
         self.__enemies_coords: list[dict] = self.__stage_configs.get('enemies').get('enemies_coords')
         self.__enemies_configs: dict = self.__stage_configs.get('enemies').get('enemies_configs')
         self.__enemies_amount = self.__stage_configs.get('enemies').get('enemies_amount')
         self.__score_multiplier = self.__stage_configs.get('score_multiplier')
-        
-        self.__platforms_coords: list[dict] = self.__stage_configs.get('platforms')
 
-        self.__bgd_img = pg.image.load(self.__stage_configs.get('scenario').get('background'))
-        self.__bgd_scaled_img = pg.transform.scale(self.__bgd_img, (self.__limit_w, self.__limit_h))
-        self.__player_presets = self.__stage_configs.get('player')
+        self.__bgd_scaled_img = sf.get_surface(
+            self.__stage_configs.get('scenario').get('background'),
+            dimensions=(self.__limit_w, self.__limit_h),
+            convert_alpha=False
+        )
+        self.__player_presets = self.__stage_configs.get('player', {})
         self.__player_max_hp = self.__player_presets.get('hp')
         self.__player_max_mp = self.__player_presets.get('mp')
         self.__player_coords = self.__player_presets.get('coords')
-        self.player_sprite.initial_config(self.__player_max_hp, self.__player_max_mp)
+        ki_blast_damage = self.__player_presets.get('ki_blast_damage', self.__stage_configs.get('ki_blast_damage', 50))
+        kame_damage = self.__player_presets.get('kame_damage', self.__stage_configs.get('kame_damage', 5000))
+        self.player_sprite.initial_config(self.__player_max_hp, self.__player_max_mp, ki_blast_damage, kame_damage)
         self.player_sprite.initial_level_coords(self.__player_coords.get('x'), self.__player_coords.get('y'))
         self.__playing_sound = False
         self.__music_stage = pg.mixer.Sound(self.__stage_configs.get('scenario').get('background_music'))
@@ -73,10 +80,9 @@ class Stage:
         self.__spawn_platforms()
         self.__set_fonts()
         self.__time_left = self.__stage_configs.get('time_seconds')
-        self.__minutes_left = 500
-        self.__seconds_left = 500
+        self.__minutes_left, self.__seconds_left = divmod(self.__time_left, 60)
+        self.__time_display = f'{self.__minutes_left:02.0f}:{self.__seconds_left:02.0f}'
         self.__actual_time = pg.time.get_ticks()
-        self.__time_display = ''
 
     @property
     def stage_name(self):
@@ -93,8 +99,8 @@ class Stage:
         self.__time_text = pg.font.Font("./assets/fonts/Halimount.otf", 32)
         #self.__fuente_negrita_inclinada = pg.font.Font("./assets/fonts/", 72)
 
-    def __configure_lose_box(self, ):
-        text_you = pg.surface.Surface = self.__main_font.render('you ', True, DBZ_YELLOW)
+    def __configure_lose_box(self):
+        text_you = self.__main_font.render('you ', True, DBZ_YELLOW)
         text_failed = self.__main_font.render('failed', True, DBZ_RED)
         center_width_box = text_you.get_width() + text_failed.get_width()
         center_height_box = max(text_you.get_height(), text_failed.get_height())
@@ -147,9 +153,7 @@ class Stage:
         """
         The function spawns enemies based on the given coordinates and enemy configurations.
         """
-        amount = len(self.__enemies_coords)\
-            if len(self.__enemies_coords) > self.__enemies_amount\
-            else self.__enemies_amount
+        amount = min(len(self.__enemies_coords), self.__enemies_amount)
         for i in range(amount):
             coord = self.__enemies_coords[i]
             self.enemies.add(
@@ -222,13 +226,18 @@ class Stage:
         )
 
     def __check_collide(self):
-        for blast in self.player_sprite.get_blasts:
-            for enemy in self.enemies:
+        for blast in list(self.player_sprite.get_blasts):
+            for enemy in list(self.enemies):
+                if not enemy.alive():
+                    continue
                 if pg.sprite.collide_rect(blast, enemy):
                     self.__add_explotion(enemy.rect)
-                    self.__asignar_puntajes_a_jugador(enemy)
                     blast.kill()
-                    enemy.kill()
+                    is_dead = enemy.take_damage(blast.damage)
+                    if is_dead:
+                        self.__asignar_puntajes_a_jugador(enemy)
+                        enemy.kill()
+                    break
             
             # pg.sprite.spritecollide(blast, self.enemies, True)
             # if cantidad_enemigos_antes > cantidad_enemigos_despues:
@@ -237,6 +246,10 @@ class Stage:
     def __update_time(self):
         if self.__time_left >= 0:
             current_time = pg.time.get_ticks()
+            # Si el jugador está cargando el Kamehameha, el tiempo de la partida se pausa
+            if self.player_sprite.is_charging_kame():
+                self.__actual_time = current_time
+                return
             if current_time - self.__actual_time >= 1000:
                 self.__minutes_left, self.__seconds_left = divmod(self.__time_left, 60)
                 self.__time_display = f'{self.__minutes_left:02.0f}:{self.__seconds_left:02.0f}'
@@ -245,10 +258,16 @@ class Stage:
 
     def run(self, delta_ms, lista_teclas, lista_teclado_un_click):
         self.__update_time()
-        self.enemies.update(delta_ms, self.__main_screen, self.__floor_y_coord)
+        # Si el jugador está cargando el Kame, los enemigos quedan congelados en el lugar
+        if self.player_sprite.is_charging_kame():
+            for enemy in self.enemies:
+                enemy.draw(self.__main_screen)
+        else:
+            self.enemies.update(delta_ms, self.__main_screen, self.__floor_y_coord, self.platforms)
         self.platforms.update(self.__main_screen)
         self.__explotions_group.update(self.__main_screen)
-        self.player.update(delta_ms, self.__main_screen, lista_teclas, lista_teclado_un_click, self.__floor_y_coord)
+        self.player_sprite.update(delta_ms, self.__main_screen, lista_teclas, lista_teclado_un_click, self.__floor_y_coord, self.platforms)
+        self.player_sprite.draw(self.__main_screen)
         self.__check_collide()
         self.__play_music()
         # self.__check_hp_boss()
