@@ -133,7 +133,7 @@ class Game:
                         message = f'Click coords: {event.pos}'
                         print(message)
                     case pg.KEYDOWN:
-                        if event.key == pg.K_z:
+                        if event.key == pg.K_x:
                             import models.constants as const
                             const.debug['actual_status'] = not const.debug['actual_status']
             
